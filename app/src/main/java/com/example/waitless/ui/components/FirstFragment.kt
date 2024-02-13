@@ -1,11 +1,11 @@
-package com.example.waitless
-
+package com.example.waitless.ui.components
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.example.waitless.R
 import com.example.waitless.databinding.FragmentFirstBinding
 
 /**
