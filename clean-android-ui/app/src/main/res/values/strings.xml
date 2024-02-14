@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">clean-desktop-ui</string>
+    <string name="back_button">Back</string>
+    <string name="settings">Settings</string>
+    <string name="equipment_avail">Equipment Available</string>
+    <string name="saved_workouts">Saved Workouts</string>
+    <string name="todays_workout">Today\'s Workout</string>
 </resources>
