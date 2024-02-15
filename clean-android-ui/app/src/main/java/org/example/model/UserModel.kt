@@ -1,13 +1,13 @@
 package org.example.model
 
 class UserModel : IPresenter() {
-    var firstname: String = ""
+    var username: String = ""
         set(value) {
             field = value
             notifySubscribers()
         }
 
-    var lastname: String = ""
+    var password: String = ""
         set(value) {
             field = value
             notifySubscribers()
