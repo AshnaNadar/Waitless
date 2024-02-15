@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -104,7 +105,7 @@ fun WaitlessMenuBar(
         }
     }
 }
-
+@Preview
 @Composable
 fun WaitlessApp(
     navController: NavHostController = rememberNavController()
@@ -113,37 +114,35 @@ fun WaitlessApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     // Get the name of the current screen
     val currentScreen = WaitlessScreen.valueOf(
-        backStackEntry?.destination?.route ?: WaitlessScreen.Login.name
+        backStackEntry?.destination?.route ?: WaitlessScreen.Today.name
     )
 
     Scaffold(
-        topBar = {
-            WaitlessAppBar(
-                currentScreen = currentScreen,
-                canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() }
-            )
-        },
-        bottomBar = {
-            WaitlessMenuBar(
-                onEquipmentButtonClicked = { navController.navigate(WaitlessScreen.Equipment.name) },
-                onSavedButtonClicked = { navController.navigate(WaitlessScreen.Saved.name) },
-                onSettingsButtonClicked = { navController.navigate(WaitlessScreen.Settings.name) },
-                onTodayButtonClicked = { navController.navigate(WaitlessScreen.Today.name) })
-        }
+//        topBar = {
+//            WaitlessAppBar(
+//                currentScreen = currentScreen,
+//                canNavigateBack = navController.previousBackStackEntry != null,
+//                navigateUp = { navController.navigateUp() }
+//            )
+//        },
+//        bottomBar = {
+//            WaitlessMenuBar(
+//                onEquipmentButtonClicked = { navController.navigate(WaitlessScreen.Equipment.name) },
+//                onSavedButtonClicked = { navController.navigate(WaitlessScreen.Saved.name) },
+//                onSettingsButtonClicked = { navController.navigate(WaitlessScreen.Settings.name) },
+//                onTodayButtonClicked = { navController.navigate(WaitlessScreen.Today.name) })
+//        }
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = WaitlessScreen.Login.name,
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
             composable(route = WaitlessScreen.Login.name) {
                 LoginView( // routes to LoginView.kt
                     onLoginButtonClicked = { navController.navigate(WaitlessScreen.Today.name) },
-                    modifier = Modifier.fillMaxHeight()
+//                    modifier = Modifier.fillMaxHeight()
                 )
             }
             composable(route = WaitlessScreen.Today.name) {
@@ -152,7 +151,10 @@ fun WaitlessApp(
                     onTodayButtonClicked = { navController.navigate(WaitlessScreen.Today.name) },
                     onSavedButtonClicked = { navController.navigate(WaitlessScreen.Saved.name) },
                     onSettingsButtonClicked = { navController.navigate(WaitlessScreen.Settings.name) },
-                    modifier = Modifier.fillMaxHeight()
+                    currentScreen = currentScreen,
+                    canNavigateBack = navController.previousBackStackEntry != null,
+                    navigateUp = { navController.navigate(WaitlessScreen.Login.name) }
+//                    modifier = Modifier.fillMaxHeight()
                 )
             }
         }
