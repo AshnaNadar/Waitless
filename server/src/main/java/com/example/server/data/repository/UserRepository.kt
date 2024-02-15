@@ -1,24 +1,26 @@
 package com.example.server.data.repository
 
-import com.example.server.models.entities.UserService.Users
+import com.example.server.models.entities.UserService.User
 import com.example.server.models.entities.ExposedUser
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository {
-    fun createUser(user: ExposedUser): Int {
+    fun createUser(user: ExposedUser): EntityID<Int> {
         return transaction {
-            Users.insert {
+            User.insert {
                 it[name] = user.name
-                // You should hash the password here
-            } get Users.id
+                it[email] = user.email
+                it[password] = user.password
+            } get User.id
         }
     }
 
     fun readUser(id: Int): ExposedUser? {
         return transaction {
-            Users.select { Users.id eq id }
+            User.select { User.id eq id }
                 .mapNotNull { toExposedUser(it) }
                 .singleOrNull()
         }
@@ -26,21 +28,23 @@ class UserRepository {
 
     fun updateUser(id: Int, user: ExposedUser) {
         transaction {
-            Users.update({ Users.id eq id }) {
+            User.update({ User.id eq id }) {
                 it[name] = user.name
-                // Remember to hash the password if it's being updated
+                it[email] = user.email
             }
         }
     }
 
     fun deleteUser(id: Int) {
         transaction {
-            Users.deleteWhere { Users.id eq id }
+            User.deleteWhere { User.id eq id }
         }
     }
 
     private fun toExposedUser(row: ResultRow): ExposedUser =
         ExposedUser(
-            name = row[Users.name]
+            name = row[User.name],
+            password = row[User.password],
+            email = row[User.email]
         )
 }
