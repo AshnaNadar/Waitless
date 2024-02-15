@@ -56,7 +56,7 @@ import org.example.WaitlessScreen
 middle section of scaffold for fragments
  */
 @Composable
-fun UserView(
+fun SettingsView(
     onEquipmentButtonClicked: () -> Unit = {},
     onTodayButtonClicked: () -> Unit = {},
     onSavedButtonClicked: () -> Unit = {},
@@ -90,65 +90,10 @@ fun UserView(
                 modifier = Modifier.padding(8.dp),
                 text =
                 """
-                    Home Page.
+                    Settings Page.
                 """.trimIndent(),
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun WaitlessAppBar(
-    currentScreen: WaitlessScreen,
-    canNavigateBack: Boolean,
-    navigateUp: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TopAppBar(
-        title = { Text(stringResource(currentScreen.title)) },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        modifier = modifier,
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back_button)
-                    )
-                }
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun WaitlessMenuBar(
-    onEquipmentButtonClicked: () -> Unit,
-    onTodayButtonClicked: () -> Unit,
-    onSavedButtonClicked: () -> Unit,
-    onSettingsButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    BottomAppBar {
-        Row (Modifier
-            .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly) {
-            Button(onClick = onTodayButtonClicked) {
-                Text("Today")
-            }
-            Button(onClick = onEquipmentButtonClicked) {
-                Text("Equip")
-            }
-            Button(onClick = onSavedButtonClicked) {
-                Text("Saved")
-            }
-            Button(onClick = onSettingsButtonClicked) {
-                Text("Settings")
-            }
-        }
-    }
-}
