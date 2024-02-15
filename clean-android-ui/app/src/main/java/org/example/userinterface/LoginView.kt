@@ -26,48 +26,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import org.example.controller.UserController
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /*
 contains 2 text fields for username/password & login button that
 routes to home page (UserView.kt)
  */
+@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginView(
     onLoginButtonClicked: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var text by remember { mutableStateOf("Test") }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("")}
 
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("Login Screen") })
-        },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Bottom app bar",
-                )
-            }
         }
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.fillMaxWidth()
+            .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly) {
             TextField(
-                text,
+                username,
                 label = {Text("Username: ")},
-                onValueChange = { text = it })
+                onValueChange = { username = it })
             TextField(
-                text,
+                password,
                 label = {Text("Password: ")},
-                onValueChange = { text = it })
+                onValueChange = { password = it },
+                visualTransformation =  PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
 
             Row (horizontalArrangement = Arrangement.SpaceEvenly) {
                 Button(onClick = onLoginButtonClicked) {
