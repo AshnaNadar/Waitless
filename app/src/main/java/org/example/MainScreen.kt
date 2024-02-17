@@ -35,15 +35,15 @@ import org.example.userinterface.MenuBarOptions
 fun WaitlessApp(
     navController: NavHostController = rememberNavController()
 ) {
-    var showBottomBar by rememberSaveable { mutableStateOf(true) }
+    var showNav by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    showBottomBar = when (navBackStackEntry?.destination?.route) {
+    showNav = when (navBackStackEntry?.destination?.route) {
         MenuBarOptions.Login.route -> false // on this screen bottom bar should be hidden
         else -> true // in all other cases show bottom bar
     }
     Scaffold(
         topBar = {
-            if (showBottomBar)
+            if (showNav)
                 WaitlessTopBar(
                 currentScreen = navBackStackEntry?.destination?.route ?: MenuBarOptions.Home.route,
                 canNavigateBack = navController.previousBackStackEntry != null,
@@ -51,7 +51,7 @@ fun WaitlessApp(
             )
         },
         bottomBar = {
-            if (showBottomBar) WaitlessMenuBar(navController = navController)
+            if (showNav) WaitlessMenuBar(navController = navController)
         }
     )
     {
