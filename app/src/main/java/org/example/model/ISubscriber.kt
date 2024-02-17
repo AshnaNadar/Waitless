@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.model
 
 interface ISubscriber {
     fun update()
