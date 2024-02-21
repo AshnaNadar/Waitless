@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.userinterface.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,15 +12,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EquipmentView() {
+fun SettingsView() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Yellow)
+            .background(Color.Cyan)
             .padding(top = 80.dp, start = 20.dp, end = 20.dp)
     ) {
         Text(
-            text = "Equipment",
+            text = "Settings",
             fontSize = MaterialTheme.typography.titleMedium.fontSize,
             fontWeight = FontWeight.Bold,
             color = Color.White

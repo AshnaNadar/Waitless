@@ -18,6 +18,12 @@ sealed class MenuBarOptions (
         title = "Login",
         icon = Icons.Default.ExitToApp
     )
+
+    data object EquipmentInfo: MenuBarOptions(
+        route = "equipment/info",
+        title = "Equipment Info",
+        icon = Icons.Default.ExitToApp
+    )
     data object Home: MenuBarOptions(
         route = "home",
         title = "Home",
