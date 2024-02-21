@@ -1,12 +1,15 @@
 package org.example.userinterface
 
-import android.view.Menu
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import org.example.userinterface.Equipment.EquipmentInfo.EquipmentInfoView
+import org.example.userinterface.Equipment.EquipmentView
+import org.example.userinterface.Home.HomeView
+import org.example.userinterface.Login.LoginView
+import org.example.userinterface.Saved.SavedView
+import org.example.userinterface.Settings.SettingsView
 
 @Composable
 fun MenuBarGraph(navController: NavHostController) {
@@ -27,7 +30,10 @@ fun MenuBarGraph(navController: NavHostController) {
             SavedView()
         }
         composable(route = MenuBarOptions.Equipment.route) {
-            EquipmentView()
+            EquipmentView(onEquipmentClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) })
+        }
+        composable(route = MenuBarOptions.EquipmentInfo.route) {
+            EquipmentInfoView()
         }
     }
 }

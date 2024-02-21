@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.userinterface.Saved
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,15 +12,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SettingsView() {
+fun SavedView() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Cyan)
+            .background(Color.Green)
             .padding(top = 80.dp, start = 20.dp, end = 20.dp)
     ) {
         Text(
-            text = "Settings",
+            text = "Saved",
             fontSize = MaterialTheme.typography.titleMedium.fontSize,
             fontWeight = FontWeight.Bold,
             color = Color.White
