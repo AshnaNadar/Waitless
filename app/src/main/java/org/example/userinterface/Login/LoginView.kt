@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.userinterface.Login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,17 +32,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
-/*
-contains 2 text fields for username/password & login button that
-routes to home page (UserView.kt)
- */
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginView(
-    onLoginButtonClicked: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onLoginButtonClicked: () -> Unit = {}
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("")}
