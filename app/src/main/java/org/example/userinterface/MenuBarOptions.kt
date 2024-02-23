@@ -12,6 +12,7 @@ sealed class MenuBarOptions (
     val route: String,
     val title: String,
     val icon: ImageVector,
+    val icon_focused: ImageVector
 ) {
     data object Login: MenuBarOptions(
         route = "login",
