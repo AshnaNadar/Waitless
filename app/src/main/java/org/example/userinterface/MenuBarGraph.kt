@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import org.example.userinterface.Equipment.EquipmentInfo.EquipmentInfoView
 import org.example.userinterface.Equipment.EquipmentView
 import org.example.userinterface.Home.HomeView
+import org.example.userinterface.Home.HomeWorkoutView
 import org.example.userinterface.Login.LoginView
 import org.example.userinterface.Saved.SavedView
 import org.example.userinterface.Settings.SettingsView
@@ -21,7 +22,17 @@ fun MenuBarGraph(navController: NavHostController) {
             LoginView(onLoginButtonClicked = { navController.navigate(MenuBarOptions.Home.route) })
         }
         composable(route = MenuBarOptions.Home.route) {
-            HomeView()
+            HomeView(
+                onInfoClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
+                onSeeAllClicked = { navController.navigate(MenuBarOptions.Saved.route) },
+                onEditWorkoutClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) }
+            )
+        }
+        composable(route = MenuBarOptions.HomeWorkout.route) {
+            HomeWorkoutView(
+                onLastSetClicked = { navController.navigate(MenuBarOptions.Home.route) },
+                onEquipmentInfoClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) }
+            )
         }
         composable(route = MenuBarOptions.Settings.route) {
             SettingsView()
