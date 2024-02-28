@@ -24,6 +24,13 @@ sealed class MenuBarOptions (
         title = "Equipment Info",
         icon = Icons.Default.ExitToApp
     )
+
+    data object HomeWorkout: MenuBarOptions(
+        route = "home/workout",
+        title = "Home Workout",
+        icon = Icons.Default.ExitToApp
+    )
+
     data object Home: MenuBarOptions(
         route = "home",
         title = "Home",

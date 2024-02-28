@@ -1,5 +1,6 @@
 package org.example.userinterface.Home
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,10 +36,9 @@ import org.example.userinterface.Equipment.EquipmentView
 
 @Preview
 @Composable
-fun HomeView(
-    onInfoClicked: () -> Unit = {},
-    onSeeAllClicked: () -> Unit = {},
-    onEditWorkoutClicked: () -> Unit = {}
+fun HomeWorkoutView(
+    onLastSetClicked: () -> Unit = {},
+    onEquipmentInfoClicked: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -56,34 +56,58 @@ fun HomeView(
                     .padding(5.dp)
             ) {
                 Text(
-                    text = "Today's Workout",
+                    text = "Current Machine",
                     style = Typography.headlineMedium
                 )
+            }
+
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                    .background(Pink40)
+                    .padding(10.dp)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "Sample Machine",
+                        style = Typography.bodyLarge
+                    )
+                    Button(
+                        onClick = onEquipmentInfoClicked,
+                        colors = ButtonDefaults.buttonColors(PurpleGrey40)
+                    ) {
+                        Text(text = "info", style = Typography.bodySmall)
+                    }
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Button(
-                    onClick = onInfoClicked,
-                    colors = ButtonDefaults.buttonColors(Pink40)
+                Column(
+                    horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = "info",
-                        style = Typography.bodySmall,
-                        color = Color.Black)
+                        text = "X:XX",
+                        style = Typography.bodyLarge
+                    )
+                    Text(
+                        text = "minutes elapsed",
+                        style = Typography.bodyLarge
+                    )
                 }
             }
 
-            Text(
-                text = "No active workout - start one now!",
-                style = Typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
-
             Button(
-                onClick = onInfoClicked,
-                colors = ButtonDefaults.buttonColors(PurpleGrey40)
+                onClick = onLastSetClicked,
+                colors = ButtonDefaults.buttonColors(PurpleGrey40),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
             ) {
-                Text(text = "Add Machines", style = Typography.bodyMedium)
+                Text(text = "Last Set", style = Typography.bodyMedium)
             }
 
             Row(
@@ -93,24 +117,12 @@ fun HomeView(
                     .padding(5.dp)
             ) {
                 Text(
-                    text = "Your Workouts",
+                    text = "Upcoming Machines",
                     style = Typography.headlineSmall
                 )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Button(
-                    onClick = onSeeAllClicked,
-                    colors = ButtonDefaults.buttonColors(Pink40)
-                ) {
-                    Text(
-                        text = "See All",
-                        style = Typography.bodySmall,
-                        color = Color.Black)
-                }
             }
 
-            // scrollable column to go through saved workouts
+            // scrollable column to go through upcoming machines
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
@@ -129,14 +141,14 @@ fun HomeView(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = "Sample Workout",
+                            text = "Sample Machine",
                             style = Typography.bodyLarge
                         )
                         Button(
-                            onClick = onEditWorkoutClicked,
+                            onClick = onEquipmentInfoClicked,
                             colors = ButtonDefaults.buttonColors(PurpleGrey40)
                         ) {
-                            Text(text = "edit", style = Typography.bodySmall)
+                            Text(text = "info", style = Typography.bodySmall)
                         }
                     }
 
@@ -150,7 +162,7 @@ fun HomeView(
                             style = Typography.bodyLarge
                         )
                         Text(
-                            text = "machines",
+                            text = "people waiting",
                             style = Typography.bodyLarge
                         )
                     }
