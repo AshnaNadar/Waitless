@@ -1,14 +1,17 @@
 package org.example
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -19,8 +22,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,6 +35,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import org.example.userinterface.MenuBarGraph
 import org.example.userinterface.MenuBarOptions
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import org.example.theme.* // import all colors and themes
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview
 @Composable
@@ -45,10 +59,10 @@ fun WaitlessApp(
         topBar = {
             if (showNav)
                 WaitlessTopBar(
-                currentScreen = navBackStackEntry?.destination?.route ?: MenuBarOptions.Home.route,
-                canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = {navController.navigate(MenuBarOptions.Login.route)}
-            )
+                    currentScreen = navBackStackEntry?.destination?.route ?: MenuBarOptions.Home.route,
+                    canNavigateBack = navController.previousBackStackEntry != null,
+                    navigateUp = {navController.navigate(MenuBarOptions.Login.route)}
+                )
         },
         bottomBar = {
             if (showNav) WaitlessMenuBar(navController = navController)
@@ -86,7 +100,6 @@ fun WaitlessTopBar(
     )
 }
 
-
 @Composable
 fun WaitlessMenuBar(navController: NavHostController) {
     val screens = listOf(
@@ -98,15 +111,32 @@ fun WaitlessMenuBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    NavigationBar {
-        screens.forEach { screen ->
-            AddItem(
-                screen = screen,
-                currentDestination = currentDestination,
-                navController = navController
+    Column( // to align stuff to the center of the page
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box( // so that the bg image can be added
+            modifier = Modifier
+                .height(100.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                bitmap = ImageBitmap.imageResource(id = R.drawable.menubar),
+                contentDescription = null, // Provide a content description if needed
             )
+            Row(
+                modifier = Modifier
+                    .padding(0.dp)
+            ) {
+                screens.forEach { screen ->
+                    AddItem(
+                        screen = screen,
+                        currentDestination = currentDestination,
+                        navController = navController
+                    )
+                }
+            }
         }
-
     }
 }
 
@@ -116,25 +146,47 @@ fun RowScope.AddItem(
     currentDestination: NavDestination?,
     navController: NavHostController
 ) {
-    NavigationBarItem(
-        label = {
-            Text(text = screen.title)
-        },
-        icon = {
+
+    val selected = currentDestination?.hierarchy?.any {
+        val test: String = it.route?: ""
+        test.split("/")[0] == screen.route
+    } == true
+
+    val background = if (selected) {
+        ImageBitmap.imageResource(id = R.drawable.kettleball)
+    } else {
+        ImageBitmap.imageResource(id = R.drawable.kettleball_transparent)
+    }
+
+    Box (
+        modifier = Modifier
+            .clickable(onClick = {
+                navController.navigate(screen.route) {
+                    popUpTo(navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                }
+            }),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            bitmap = background,
+            contentDescription = null,
+            modifier = Modifier
+                .height(110.dp)
+                .padding(bottom = 15.dp, start = 4.dp, end = 4.dp)
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Icon(
                 imageVector = screen.icon,
-                contentDescription = "Navigation Icon"
+                contentDescription = "Navigation Icon",
+                tint = if (selected) DarkGreen else Color.White
             )
-        },
-        selected = currentDestination?.hierarchy?.any {
-            val test: String = it.route?: ""
-            test.split("/")[0] == screen.route
-        } == true,
-        onClick = {
-            navController.navigate(screen.route) {
-                popUpTo(navController.graph.findStartDestination().id)
-                launchSingleTop = true
-            }
+            Text(text = screen.title,
+                fontSize = 12.sp,
+                color = if (selected) DarkGreen else Color.White
+            )
         }
-    )
+    }
 }
