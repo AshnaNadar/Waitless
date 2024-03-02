@@ -30,7 +30,8 @@ fun MenuBarGraph(navController: NavHostController) {
         }
         composable(route = MenuBarOptions.HomeWorkout.route) {
             HomeWorkoutView(
-                onLastSetClicked = { navController.navigate(MenuBarOptions.Home.route) },
+                onStopWorkoutClicked = { navController.navigate(MenuBarOptions.Home.route) },
+                onLastSetClicked = { },
                 onEquipmentInfoClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) }
             )
         }

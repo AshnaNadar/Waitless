@@ -84,7 +84,7 @@ fun WaitlessTopBar(
     TopAppBar(
         title = { Text(currentScreen.split("/").last().replaceFirstChar { it.uppercase() } )},
         colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = Color.Transparent
         ),
         modifier = modifier,
         navigationIcon = {
