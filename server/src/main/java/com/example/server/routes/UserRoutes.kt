@@ -11,13 +11,6 @@ import io.ktor.server.routing.*
 fun Route.userRoutes() {
     val userRepository = UserRepository()
 
-    // Create user
-    post("/users") {
-        val user = call.receive<ExposedUser>()
-        val id = userRepository.createUser(user)
-        call.respond(HttpStatusCode.Created, id)
-    }
-
     // Read user
     get("/users/{id}") {
         val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
