@@ -24,9 +24,6 @@ fun Application.module() {
     configureRouting()
     routing {
         userRoutes()
-        authRoutes(
-            supabaseUrl = supabaseUrl,
-            supabaseAnonKey = supabaseAnonKey
-        )
+        authRoutes()
     }
 }

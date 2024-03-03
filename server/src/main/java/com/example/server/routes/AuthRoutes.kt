@@ -13,10 +13,7 @@ import com.example.server.data.repository.UserRepository
 @Serializable
 data class SignUpRequest(val name: String, val email: String, val password: String)
 @Serializable
-data class SignInRequest(
-    val email: String,
-    val password: String,
-)
+data class SignInRequest(val email: String, val password: String)
 
 suspend fun signUp(e: String, p: String): Email.Result? {
     val supabase = SupabaseClient.supabase
@@ -30,8 +27,8 @@ suspend fun signUp(e: String, p: String): Email.Result? {
 suspend fun signIn(e: String, p: String) {
     val supabase = SupabaseClient.supabase
     val result = supabase.auth.signInWith(Email) {
-        email = "example@email.com"
-        password = "example-password"
+        email = e
+        password = p
     }
     return result
 }
@@ -70,12 +67,23 @@ fun Route.authRoutes() {
     post("/auth/signin") {
         val signInRequest = call.receive<SignInRequest>()
         try {
-            val result = signIn(signInRequest.email, signInRequest.password)
-            print(result)
-            val responseBody = mapOf("message" to "Sign-in successful", "userId" to result)
-            call.respond(HttpStatusCode.OK, responseBody)
+            signIn(signInRequest.email, signInRequest.password)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to sign in: ${e.localizedMessage}")
+        }
+
+        try {
+            val supabase = SupabaseClient.supabase
+            val session = supabase.auth.currentSessionOrNull()
+            if (session === null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to read user record")
+                return@post
+            } else {
+                // set session token. We might need to setup middleware
+                call.respond(HttpStatusCode.OK, "User record read successfully: ${session}")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to read user record: ${e.localizedMessage}")
         }
     }
 
