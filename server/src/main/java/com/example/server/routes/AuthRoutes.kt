@@ -34,13 +34,13 @@ suspend fun signIn(e: String, p: String) {
 }
 suspend fun signOut() {
     val supabase = SupabaseClient.supabase
-    val result = supabase.auth.signOut()
-    return result
+    return supabase.auth.signOut()
 }
 
 fun Route.authRoutes() {
     post("/auth/signup") {
         val signUpRequest = call.receive<SignUpRequest>()
+        val uid: String
 
         // Attempt to create Supabase auth user
         try {
@@ -48,6 +48,8 @@ fun Route.authRoutes() {
             if (result === null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to sign up with Supabase")
                 return@post
+            } else {
+                uid = result.id
             }
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to sign up: ${e.localizedMessage}")
@@ -57,7 +59,7 @@ fun Route.authRoutes() {
         // Attempt to create DB record
         try {
             val userRepository = UserRepository()
-            val user = userRepository.createUser(signUpRequest.name, signUpRequest.email, signUpRequest.password)
+            val user = userRepository.createUser(uid, signUpRequest.name, signUpRequest.email, signUpRequest.password)
             call.respond(HttpStatusCode.Created, "User created successfully: ${user.value}")
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to create user record: ${e.localizedMessage}")
@@ -94,7 +96,6 @@ fun Route.authRoutes() {
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to sign out: ${e.localizedMessage}")
         }
-
     }
 }
 
