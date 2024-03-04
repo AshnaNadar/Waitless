@@ -9,6 +9,10 @@ import com.example.server.plugins.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import com.example.server.data.repository.UserRepository
+import com.example.server.plugins.UserSession
+import io.ktor.server.sessions.clear
+import io.ktor.server.sessions.sessions
+import io.ktor.server.sessions.set
 
 @Serializable
 data class SignUpRequest(val name: String, val email: String, val password: String)
@@ -81,7 +85,7 @@ fun Route.authRoutes() {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to read user record")
                 return@post
             } else {
-                // set session token. We might need to setup middleware
+                call.sessions.set(UserSession(session.accessToken, session.refreshToken))
                 call.respond(HttpStatusCode.OK, "User record read successfully: ${session}")
             }
         } catch (e: Exception) {
@@ -92,6 +96,7 @@ fun Route.authRoutes() {
     post("/auth/signout") {
         try {
             signOut()
+            call.sessions.clear<UserSession>()
             call.respond(HttpStatusCode.OK, "Signed out successfully")
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to sign out: ${e.localizedMessage}")

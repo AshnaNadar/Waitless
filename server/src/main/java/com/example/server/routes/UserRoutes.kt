@@ -22,7 +22,6 @@ fun Route.userRoutes() {
         supabase.auth.importAuthToken(supabaseServiceRoleKey)
         val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
         val user = userRepository.readUser(id)
-        val users = adminGoTrueClient.retrieveUsers()
         if (user != null) {
             call.respond(HttpStatusCode.OK, user)
         } else {
