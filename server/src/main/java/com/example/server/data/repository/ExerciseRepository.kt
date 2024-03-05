@@ -21,37 +21,35 @@ class ExerciseRepository {
         }
     }
 
-    fun readExercise(gymId: Int, id: Int): ExposedExercise? {
-        return transaction {
-            Exercise.select { (Exercise.id eq id) and (Exercise.gymId eq gymId) }
-                .mapNotNull { toExposedExercise(it) }
-                .singleOrNull()
+    fun readExercise(gymId: Int, equipmentId: Int?): List<ExposedExercise> {
+        return if (equipmentId === null) {
+            transaction {
+                Exercise.select { (Exercise.gymId eq gymId) }
+                    .mapNotNull { toExposedExercise(it) }
+            }
+        } else {
+            transaction {
+                Exercise.select { (Exercise.id eq equipmentId) and (Exercise.gymId eq gymId) }
+                    .mapNotNull { toExposedExercise(it) }
+            }
         }
     }
 
-    fun readAllExercise(gymId: Int): List<ExposedExercise> {
-        return transaction {
-            Exercise.select { (Exercise.gymId eq gymId) }
-                .mapNotNull { toExposedExercise(it) }
-
-        }
-    }
-
-    fun updateExercise(id: Int, exercise: ExposedExercise) {
+    fun updateExercise(gymId: Int, equipmentId: Int, exercise: ExposedExercise) {
         transaction {
-            Exercise.update({ Exercise.id eq id})  {
+            Exercise.update({ (Exercise.id eq equipmentId) and (Exercise.gymId eq gymId)})  {
                 it[name] = exercise.name
                 it[description] = exercise.description
                 it[totalNumberOfMachines] = exercise.totalNumberOfMachines
                 it[numberOfMachinesAvailable] = exercise.numberOfMachinesAvailable
-                it[gymId] = exercise.gymId
+                it[this.gymId] = exercise.gymId
                 it[queueSize] = exercise.queueSize
             }
         }
     }
-    fun deleteExercise(gymId: Int, id: Int) {
+    fun deleteExercise(gymId: Int, exerciseId: Int) {
         transaction {
-            Exercise.deleteWhere { (Exercise.id eq id) and (Exercise.gymId eq gymId) }
+            Exercise.deleteWhere { (Exercise.id eq exerciseId) and (Exercise.gymId eq gymId) }
         }
     }
 

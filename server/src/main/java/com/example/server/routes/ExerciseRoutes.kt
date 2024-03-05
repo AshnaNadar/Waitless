@@ -2,6 +2,8 @@ package com.example.server.routes
 
 import com.example.server.data.repository.ExerciseRepository
 import com.example.server.models.entities.ExposedExercise
+import com.example.server.plugins.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
 import io.ktor.server.application.*
 import io.ktor.http.*
 import io.ktor.server.request.*
@@ -11,53 +13,76 @@ fun Route.exerciseRoutes() {
     val exerciseRepository = ExerciseRepository()
 
     // Create exercise
-    post("{gym_id}/exercise") {
-        try {
-            val body = call.receive<ExposedExercise>()
-            val exercise = exerciseRepository.createExercise(body)
-            call.respond(HttpStatusCode.Created, "Exercise created successfully: ${exercise.value}")
-        } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError, "Failed to create exercise: ${e.localizedMessage}")
+    post("/gyms/{gym_id}/exercises") {
+        val supabase = SupabaseClient.supabase
+        val session = supabase.auth.currentSessionOrNull()
+        if (session === null) {
+            call.respond(HttpStatusCode.InternalServerError, "You must login before you can use this endpoint")
+        } else {
+            try {
+                val body = call.receive<ExposedExercise>()
+                val exercise = exerciseRepository.createExercise(body)
+                call.respond(
+                    HttpStatusCode.Created,
+                    "Exercise created successfully: ${exercise.value}"
+                )
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Failed to create exercise: ${e.localizedMessage}"
+                )
+            }
         }
-
     }
 
     // Read specific exercise
-    get("{gym_id}/exercise/{id}") {
-        val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
-        val gymId = call.parameters["gym_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Gym ID")
-        val exercise = exerciseRepository.readExercise(gymId, id)
-        if (exercise != null) {
+    get("/gyms/{gym_id}/exercises") {
+        val supabase = SupabaseClient.supabase
+        val session = supabase.auth.currentSessionOrNull()
+        if (session === null) {
+            call.respond(HttpStatusCode.InternalServerError, "You must login before you can use this endpoint")
+        } else {
+            val equipmentId = call.parameters["equipment_id"]?.toIntOrNull()
+            val gymId = call.parameters["gym_id"]?.toIntOrNull()
+                ?: throw IllegalArgumentException("Invalid Gym ID")
+            val exercise = exerciseRepository.readExercise(gymId, equipmentId)
             call.respond(HttpStatusCode.OK, exercise)
-        } else {
-            call.respond(HttpStatusCode.NotFound)
-        }
-    }
-
-    // Read all exercises from gym
-    get("{gym_id}/exercise/all") {
-        val gymId = call.parameters["gym_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Gym ID")
-        val exercises = exerciseRepository.readAllExercise(gymId)
-        if (exercises.isNotEmpty()) {
-            call.respond(HttpStatusCode.OK, exercises)
-        } else {
-            call.respond(HttpStatusCode.NotFound)
         }
     }
 
     // Update exercise
-    put("{gym_id}/exercise/{id}") {
-        val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
-        val exercise = call.receive<ExposedExercise>()
-        exerciseRepository.updateExercise(id, exercise)
-        call.respond(HttpStatusCode.OK)
+    put("/gyms/{gym_id}/exercises/{exercise_id}") {
+        val supabase = SupabaseClient.supabase
+        val session = supabase.auth.currentSessionOrNull()
+        if (session === null) {
+            call.respond(HttpStatusCode.InternalServerError, "You must login before you can use this endpoint")
+        } else {
+            val gymId = call.parameters["gym_id"]?.toIntOrNull()
+                ?: throw IllegalArgumentException("Invalid ID")
+            val exerciseId = call.parameters["exercise_id"]?.toIntOrNull()
+                ?: throw IllegalArgumentException("Invalid ID")
+            val exercise = call.receive<ExposedExercise>()
+            exerciseRepository.updateExercise(gymId, exerciseId, exercise)
+            call.respond(HttpStatusCode.OK)
+        }
     }
 
     // Delete exercise
-    delete("{gym_id}/exercise/{id}") {
-        val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
-        val gymId = call.parameters["gym_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Gym ID")
-        exerciseRepository.deleteExercise(gymId, id)
-        call.respond(HttpStatusCode.OK)
+    delete("/gyms/{gym_id}/exercises/{exercise_id}") {
+        val supabase = SupabaseClient.supabase
+        val session = supabase.auth.currentSessionOrNull()
+        if (session === null) {
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                "You must login before you can use this endpoint"
+            )
+        } else {
+            val exerciseId = call.parameters["exercise_id"]?.toIntOrNull()
+                ?: throw IllegalArgumentException("Invalid ID")
+            val gymId = call.parameters["gym_id"]?.toIntOrNull()
+                ?: throw IllegalArgumentException("Invalid Gym ID")
+            exerciseRepository.deleteExercise(gymId, exerciseId)
+            call.respond(HttpStatusCode.OK)
+        }
     }
 }
