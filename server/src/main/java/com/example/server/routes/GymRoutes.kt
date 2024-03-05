@@ -19,7 +19,7 @@ fun Route.gymRoutes() {
     // Create exercise
 
     post("/gym/") {
-        val req = call.receive<CreateGymRequest>()
+        val req = call.receive<ExposedGym>()
         try {
 //            val name = call.parameters["name"] ?: throw IllegalArgumentException("Invalid Name")
 //            val description = call.parameters["description"] ?: ""
@@ -27,7 +27,7 @@ fun Route.gymRoutes() {
 //            val numberOfMachinesAvailable = call.parameters["number_of_machines_available"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid number of machines available")
 //            val queueSize = call.parameters["queue_size"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Queue Size")
 //            val gymId = call.parameters["gym_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Gym ID")
-            val gym = gymRepository.createGym((ExposedGym(req.name)))
+            val gym = gymRepository.createGym(req)
             call.respond(HttpStatusCode.Created, "User created successfully: ${gym.value}")
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to create gym: ${e.localizedMessage}")

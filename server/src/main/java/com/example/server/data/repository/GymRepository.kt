@@ -12,7 +12,7 @@ class GymRepository {
         return transaction {
             Gym.insert {
                 it[name] = gym.name
-            } get Exercise.id
+            } get Gym.id
         }
     }
 

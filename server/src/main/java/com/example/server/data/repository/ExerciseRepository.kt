@@ -2,7 +2,6 @@ package com.example.server.data.repository
 
 import com.example.server.models.entities.ExerciseService.Exercise
 import com.example.server.models.entities.ExposedExercise
-import com.example.server.routes.CreateExerciseRequest
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -50,16 +49,6 @@ class ExerciseRepository {
             }
         }
     }
-
-    fun updateUser(id: Int, user: ExposedExercise) {
-        transaction {
-            Exercise.update({ Exercise.id eq id }) {
-                it[name] = user.name
-                it[description] = user.description
-            }
-        }
-    }
-
     fun deleteExercise(gymId: Int, id: Int) {
         transaction {
             Exercise.deleteWhere { (Exercise.id eq id) and (Exercise.gymId eq gymId) }
@@ -76,5 +65,3 @@ class ExerciseRepository {
             queueSize = row[Exercise.queueSize]
         )
 }
-
-// TODO: create endpoints for CreateExercise and UpdateExercise
