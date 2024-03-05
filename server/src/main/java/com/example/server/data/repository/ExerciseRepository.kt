@@ -61,7 +61,7 @@ class ExerciseRepository {
             description = row[Exercise.description],
             totalNumberOfMachines = row[Exercise.totalNumberOfMachines],
             numberOfMachinesAvailable = row[Exercise.numberOfMachinesAvailable],
-            gymId = row[Exercise.gymId],
+            gymId = row[Exercise.gymId].value,
             queueSize = row[Exercise.queueSize]
         )
 }

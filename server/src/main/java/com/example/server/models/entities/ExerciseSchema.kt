@@ -2,6 +2,7 @@ package com.example.server.models.entities
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlinx.serialization.Serializable
+import com.example.server.models.entities.GymService.Gym
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 
@@ -13,7 +14,7 @@ class ExerciseService(private val database: Database) {
         val description = varchar("description", 1000).nullable()
         val totalNumberOfMachines = integer("total_number_of_machines")
         val numberOfMachinesAvailable = integer("number_of_machines_available")
-        val gymId = integer("gym_id")
+        val gymId = reference("gym_id", Gym)
         val queueSize = integer("queue_size")
 
 
