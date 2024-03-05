@@ -15,19 +15,16 @@ fun main() {
         .start(wait = true)
 }
 
-//. Retrieve ENV variable
-val dotenv = Dotenv.load()
-val supabaseUrl = dotenv["SUPABASE_URL"]
-val supabaseAnonKey = dotenv["SUPABASE_ANON_KEY"]
-
 fun Application.module() {
     configureSerialization()
     configureDatabases()
     configureRouting()
+    configureSessions()
     routing {
         userRoutes()
         exerciseRoutes()
         gymRoutes()
         authRoutes()
+        gymRoutes()
     }
 }

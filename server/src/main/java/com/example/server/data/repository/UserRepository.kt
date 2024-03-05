@@ -8,12 +8,13 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository {
-    fun createUser(name: String, email: String, password: String): EntityID<Int> {
+    fun createUser(authId: String, name: String, email: String, password: String): EntityID<Int> {
         return transaction {
             User.insert {
                 it[User.name] = name
                 it[User.email] = email
                 it[User.password] = password
+                it[User.authId] = authId
             } get User.id
         }
     }
@@ -44,7 +45,8 @@ class UserRepository {
     private fun toExposedUser(row: ResultRow): ExposedUser =
         ExposedUser(
             name = row[User.name],
+            email = row[User.email],
             password = row[User.password],
-            email = row[User.email]
+            authId = row[User.authId]
         )
 }
