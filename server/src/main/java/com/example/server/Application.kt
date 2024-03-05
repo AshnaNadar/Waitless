@@ -5,6 +5,8 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import com.example.server.routes.authRoutes
+import com.example.server.routes.exerciseRoutes
+import com.example.server.routes.gymRoutes
 import com.example.server.routes.userRoutes
 import io.github.cdimascio.dotenv.Dotenv
 
@@ -13,20 +15,16 @@ fun main() {
         .start(wait = true)
 }
 
-//. Retrieve ENV variable
-val dotenv = Dotenv.load()
-val supabaseUrl = dotenv["SUPABASE_URL"]
-val supabaseAnonKey = dotenv["SUPABASE_ANON_KEY"]
-
 fun Application.module() {
     configureSerialization()
     configureDatabases()
     configureRouting()
+    configureSessions()
     routing {
         userRoutes()
-        authRoutes(
-            supabaseUrl = supabaseUrl,
-            supabaseAnonKey = supabaseAnonKey
-        )
+        exerciseRoutes()
+        gymRoutes()
+        authRoutes()
+        gymRoutes()
     }
 }
