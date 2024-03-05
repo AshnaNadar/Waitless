@@ -1,43 +1,57 @@
 package com.example.server.routes
 
+import com.example.server.data.repository.GymAdminRepository
 import com.example.server.data.repository.GymRepository
 import com.example.server.models.entities.ExposedGym
+import com.example.server.models.entities.ExposedGymAdmin
 import io.ktor.server.application.*
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class CreateGymRequest(val name: String)
-
 
 fun Route.gymRoutes() {
     val gymRepository = GymRepository()
+    val gymAdminRepository = GymAdminRepository()
 
-    // Create exercise
+    // Create gym
 
-    post("/gym/") {
+    post("/gym/{id}/create") {
         val req = call.receive<ExposedGym>()
         try {
-//            val name = call.parameters["name"] ?: throw IllegalArgumentException("Invalid Name")
-//            val description = call.parameters["description"] ?: ""
-//            val totalNumberOfMachines = call.parameters["total_number_of_machines"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid total number of machines")
-//            val numberOfMachinesAvailable = call.parameters["number_of_machines_available"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid number of machines available")
-//            val queueSize = call.parameters["queue_size"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Queue Size")
-//            val gymId = call.parameters["gym_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Gym ID")
             val gym = gymRepository.createGym(req)
-            call.respond(HttpStatusCode.Created, "User created successfully: ${gym.value}")
+            call.respond(HttpStatusCode.Created, "Gym created successfully: ${gym.value}")
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to create gym: ${e.localizedMessage}")
         }
 
     }
-    // Delete exercise
-    delete("/gym/") {
+    // Delete gym
+
+    delete("/gym/{id}") {
         val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
         gymRepository.deleteGym(id)
+        call.respond(HttpStatusCode.OK)
+    }
+
+    // Create gym admin
+
+    post("/gym/{gym_id}/admin/create") {
+        val req = call.receive<ExposedGymAdmin>()
+        try {
+            val gymAdmin = gymAdminRepository.createGymAdmin(req)
+            call.respond(HttpStatusCode.Created, "Gym admin created successfully: ${gymAdmin.value}")
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to create gym admin: ${e.localizedMessage}")
+        }
+    }
+
+    // Delete gym admin
+
+    delete("/gym/{gym_id}/admin/{user_id}/delete") {
+        val gym_id = call.parameters["gym_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Gym ID")
+        val user_id = call.parameters["user_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid User ID")
+        gymAdminRepository.deleteGymAdmin(gym_id, user_id)
         call.respond(HttpStatusCode.OK)
     }
 }

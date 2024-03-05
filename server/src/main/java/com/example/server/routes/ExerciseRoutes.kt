@@ -15,9 +15,9 @@ fun Route.exerciseRoutes() {
         try {
             val body = call.receive<ExposedExercise>()
             val exercise = exerciseRepository.createExercise(body)
-            call.respond(HttpStatusCode.Created, "User created successfully: ${exercise.value}")
+            call.respond(HttpStatusCode.Created, "Exercise created successfully: ${exercise.value}")
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError, "Failed to create user record: ${e.localizedMessage}")
+            call.respond(HttpStatusCode.InternalServerError, "Failed to create exercise: ${e.localizedMessage}")
         }
 
     }

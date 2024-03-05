@@ -1,6 +1,7 @@
 package com.example.server.plugins
 
 import com.example.server.models.entities.ExerciseService
+import com.example.server.models.entities.GymAdminService
 import com.example.server.models.entities.GymService
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.server.application.*
@@ -25,5 +26,6 @@ fun Application.configureDatabases() {
         UserService(database = database)
         ExerciseService(database = database)
         GymService(database = database)
+        GymAdminService(database = database)
     }
 }

@@ -1,6 +1,5 @@
 package com.example.server.data.repository
 
-import com.example.server.models.entities.ExerciseService.Exercise
 import com.example.server.models.entities.ExposedGym
 import com.example.server.models.entities.GymService.Gym
 import org.jetbrains.exposed.dao.id.EntityID
