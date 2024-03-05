@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "waitless"
+rootProject.name = "Waitless"
 include(":app")
 include(":server")

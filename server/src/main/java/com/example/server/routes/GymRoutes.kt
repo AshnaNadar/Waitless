@@ -1,32 +1,57 @@
 package com.example.server.routes
 
-import com.example.server.data.repository.UserRepository
-import com.example.server.models.entities.ExposedUser
+import com.example.server.data.repository.GymAdminRepository
+import com.example.server.data.repository.GymRepository
+import com.example.server.models.entities.ExposedGym
+import com.example.server.models.entities.ExposedGymAdmin
 import io.ktor.server.application.*
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.example.server.plugins.SupabaseClient
-import com.example.server.plugins.SupabaseClient.dotenv
-import com.example.server.plugins.UserSession
-import io.github.jan.supabase.gotrue.auth
-import io.ktor.server.sessions.get
-import io.ktor.server.sessions.sessions
 
 fun Route.gymRoutes() {
-    val supabase = SupabaseClient.supabase
-    val supabaseServiceRoleKey = dotenv["SUPABASE_SERVICE_ROLE_KEY"] ?: error("SUPABASE_SERVICE_ROLE_KEY not set")
+    val gymRepository = GymRepository()
+    val gymAdminRepository = GymAdminRepository()
 
-    // Read Gym Details
-    get("/gyms/{id}") {
-        val userSession = call.sessions.get<UserSession>()
-        if (userSession != null) {
-            val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
-            call.respondText("Accessing protected data with session: ${userSession.accessToken}")
-        } else {
-            call.respond(HttpStatusCode.Unauthorized, "Please login to access this resource")
+    // Create gym
+
+    post("/gym/{id}/create") {
+        val req = call.receive<ExposedGym>()
+        try {
+            val gym = gymRepository.createGym(req)
+            call.respond(HttpStatusCode.Created, "Gym created successfully: ${gym.value}")
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to create gym: ${e.localizedMessage}")
+        }
+
+    }
+    // Delete gym
+
+    delete("/gym/{id}") {
+        val id = call.parameters["id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid ID")
+        gymRepository.deleteGym(id)
+        call.respond(HttpStatusCode.OK)
+    }
+
+    // Create gym admin
+
+    post("/gym/{gym_id}/admin/create") {
+        val req = call.receive<ExposedGymAdmin>()
+        try {
+            val gymAdmin = gymAdminRepository.createGymAdmin(req)
+            call.respond(HttpStatusCode.Created, "Gym admin created successfully: ${gymAdmin.value}")
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to create gym admin: ${e.localizedMessage}")
         }
     }
 
+    // Delete gym admin
+
+    delete("/gym/{gym_id}/admin/{user_id}/delete") {
+        val gym_id = call.parameters["gym_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid Gym ID")
+        val user_id = call.parameters["user_id"]?.toIntOrNull() ?: throw IllegalArgumentException("Invalid User ID")
+        gymAdminRepository.deleteGymAdmin(gym_id, user_id)
+        call.respond(HttpStatusCode.OK)
+    }
 }

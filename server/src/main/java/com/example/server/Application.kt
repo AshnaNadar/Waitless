@@ -5,6 +5,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.routing.*
 import com.example.server.routes.authRoutes
+import com.example.server.routes.exerciseRoutes
 import com.example.server.routes.gymRoutes
 import com.example.server.routes.userRoutes
 import io.github.cdimascio.dotenv.Dotenv
@@ -21,6 +22,8 @@ fun Application.module() {
     configureSessions()
     routing {
         userRoutes()
+        exerciseRoutes()
+        gymRoutes()
         authRoutes()
         gymRoutes()
     }
