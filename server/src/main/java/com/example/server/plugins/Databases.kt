@@ -1,5 +1,7 @@
 package com.example.server.plugins
 
+import com.example.server.models.entities.ExerciseService
+import com.example.server.models.entities.GymService
 import io.github.cdimascio.dotenv.Dotenv
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.Database
@@ -21,5 +23,7 @@ fun Application.configureDatabases() {
 
     transaction {
         UserService(database = database)
+        ExerciseService(database = database)
+        GymService(database = database)
     }
 }
