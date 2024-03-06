@@ -16,3 +16,6 @@ val DarkerGreen = Color(0xFF6C875C)
 val LightGrey = Color(0xFFF8F8FA)
 val DarkGrey = Color(0xFF474A56)
 
+val Background = Color(0xFFFFFFFF)
+val GreyText = Color(0xFFC8D1E1)
+

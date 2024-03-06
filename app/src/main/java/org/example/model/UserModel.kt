@@ -12,4 +12,10 @@ class UserModel : IPresenter() {
             field = value
             notifySubscribers()
         }
+
+    var selectedWorkout: Int = 0
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
 }

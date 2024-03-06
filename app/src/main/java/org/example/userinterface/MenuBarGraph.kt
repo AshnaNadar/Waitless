@@ -25,12 +25,13 @@ fun MenuBarGraph(navController: NavHostController) {
             HomeView(
                 onInfoClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
                 onSeeAllClicked = { navController.navigate(MenuBarOptions.Saved.route) },
-                onEditWorkoutClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) }
+                onStartClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) }
             )
         }
         composable(route = MenuBarOptions.HomeWorkout.route) {
             HomeWorkoutView(
-                onLastSetClicked = { navController.navigate(MenuBarOptions.Home.route) },
+                onStopWorkoutClicked = { navController.navigate(MenuBarOptions.Home.route) },
+                onLastSetClicked = { },
                 onEquipmentInfoClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) }
             )
         }
@@ -38,7 +39,9 @@ fun MenuBarGraph(navController: NavHostController) {
             SettingsView()
         }
         composable(route = MenuBarOptions.Saved.route) {
-            SavedView()
+            SavedView(
+                onEditWorkoutClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) }
+            )
         }
         composable(route = MenuBarOptions.Equipment.route) {
             EquipmentView(onEquipmentClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) })
