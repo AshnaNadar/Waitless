@@ -6,6 +6,7 @@ val logbackVersion: String by project
 val exposedVersion: String by project
 val h2Version: String by project
 val postgresqlVersion: String by project
+val supabaseVersion: String by project
 
 plugins {
     application // This allows you to run the Ktor server as a standalone application
@@ -31,6 +32,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm")
+    implementation("io.ktor:ktor-server-sessions:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 
     // Ktor client dependencies
@@ -56,7 +58,17 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
     // Testing dependencies
-    testImplementation("io.ktor:ktor-server-tests:2.3.8")
+    testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
+
+    // supabase-kt
+    implementation("io.ktor:ktor-client-android:$ktorVersion")
+    implementation(platform("io.github.jan-tennert.supabase:bom:$supabaseVersion"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt")
+    implementation("io.github.jan-tennert.supabase:serializer-jackson")
+
+
+
 }
 
 tasks.withType<KotlinCompile> {

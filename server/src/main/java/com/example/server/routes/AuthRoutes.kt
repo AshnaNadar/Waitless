@@ -4,73 +4,103 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.client.request.*
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.logging.Logging
 import kotlinx.serialization.Serializable
-import io.ktor.client.plugins.contentnegotiation.*
-import kotlinx.serialization.json.Json
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.client.statement.*
+import com.example.server.plugins.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.providers.builtin.Email
+import com.example.server.data.repository.UserRepository
+import com.example.server.plugins.UserSession
+import io.ktor.server.sessions.clear
+import io.ktor.server.sessions.sessions
+import io.ktor.server.sessions.set
 
 @Serializable
-data class SignUpRequest(
-    val email: String,
-    val password: String
-)
-
+data class SignUpRequest(val name: String, val email: String, val password: String)
 @Serializable
-data class SignInRequest(
-    val email: String,
-    val password: String,
-)
+data class SignInRequest(val email: String, val password: String)
 
-fun Route.authRoutes(supabaseUrl: String, supabaseAnonKey: String) {
-    val client = HttpClient(CIO) {
-        install(Logging)
-        install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-            })
-        }
+suspend fun signUp(e: String, p: String): Email.Result? {
+    val supabase = SupabaseClient.supabase
+    val result = supabase.auth.signUpWith(Email) {
+        email = e
+        password = p
     }
+    return result
+}
 
+suspend fun signIn(e: String, p: String) {
+    val supabase = SupabaseClient.supabase
+    val result = supabase.auth.signInWith(Email) {
+        email = e
+        password = p
+    }
+    return result
+}
+suspend fun signOut() {
+    val supabase = SupabaseClient.supabase
+    return supabase.auth.signOut()
+}
+
+fun Route.authRoutes() {
     post("/auth/signup") {
         val signUpRequest = call.receive<SignUpRequest>()
+        val uid: String
 
-        val response: HttpResponse = client.post("${supabaseUrl}/auth/v1/signup") {
-            headers {
-                append("apikey", supabaseAnonKey)
-                append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        // Attempt to create Supabase auth user
+        try {
+            val result = signUp(signUpRequest.email, signUpRequest.password)
+            if (result === null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to sign up with Supabase")
+                return@post
+            } else {
+                uid = result.id
             }
-            setBody(signUpRequest)
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to sign up: ${e.localizedMessage}")
+            return@post
         }
-        // Handling response generically
-        val responseBody = response.bodyAsText()
-        call.respondText(responseBody, ContentType.Application.Json, response.status)
+
+        // Attempt to create DB record
+        try {
+            val userRepository = UserRepository()
+            val user = userRepository.createUser(uid, signUpRequest.name, signUpRequest.email, signUpRequest.password)
+            call.respond(HttpStatusCode.Created, "User created successfully: ${user.value}")
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to create user record: ${e.localizedMessage}")
+        }
     }
 
     post("/auth/signin") {
         val signInRequest = call.receive<SignInRequest>()
-        val response: HttpResponse = client.post("${supabaseUrl}/auth/v1/token") {
-            headers {
-                append("apikey", supabaseAnonKey)
-                append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            }
-            setBody(signInRequest)
+        try {
+            signIn(signInRequest.email, signInRequest.password)
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to sign in: ${e.localizedMessage}")
         }
-        // Handling response generically
-        val responseBody = response.bodyAsText()
-        call.respondText(responseBody, ContentType.Application.Json, response.status)
+
+        try {
+            val supabase = SupabaseClient.supabase
+            val session = supabase.auth.currentSessionOrNull()
+            if (session === null) {
+                call.respond(HttpStatusCode.InternalServerError, "Failed to read user record")
+                return@post
+            } else {
+                call.sessions.set(UserSession(session.accessToken, session.refreshToken))
+                call.respond(HttpStatusCode.OK, "User record read successfully: ${session}")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to read user record: ${e.localizedMessage}")
+        }
     }
 
     post("/auth/signout") {
-        // Supabase doesn't provide a sign-out API endpoint since it uses JWT tokens.
-        // Tokens are stored client-side, so "signing out" typically involves the client
-        // deleting the token from storage.
-        call.respond(HttpStatusCode.OK, "Signed out successfully")
+        try {
+            signOut()
+            call.sessions.clear<UserSession>()
+            call.respond(HttpStatusCode.OK, "Signed out successfully")
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to sign out: ${e.localizedMessage}")
+        }
     }
 }
+

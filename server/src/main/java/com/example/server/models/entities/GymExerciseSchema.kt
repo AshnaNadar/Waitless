@@ -7,7 +7,7 @@ import com.example.server.models.entities.ExerciseService.Exercise
 import com.example.server.models.entities.GymService.Gym
 
 @Serializable
-data class ExposedGymExercise(val user: Int, val workout: Int)
+data class ExposedGymExercise(val gym: Int, val exercise: Int)
 class GymExerciseService(private val database: Database) {
     // Many-to-Many relationship table between
     object GymExercise: Table() {
