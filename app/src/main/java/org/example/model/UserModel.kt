@@ -18,4 +18,5 @@ class UserModel : IPresenter() {
             field = value
             notifySubscribers()
         }
+    
 }
