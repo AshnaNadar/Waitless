@@ -52,6 +52,7 @@ fun LoginView(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("")}
     var showErrorMessage by remember { mutableStateOf(false) }
+    var errorText = ""
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -77,7 +78,7 @@ fun LoginView(
 
             if (showErrorMessage) {
                 Text(
-                    text = "Invalid Username/Password",
+                    text = errorText,
                     color = Color.Red,
                     modifier = Modifier.padding(vertical = 8.dp),
                     style = TextStyle(fontSize = 16.sp)
@@ -105,10 +106,13 @@ fun LoginView(
                                     // Other error occurred
                                     Log.d("ResponseLogin:", "Unexpected response code: ${response.status.value}")
                                     showErrorMessage = true
+                                    errorText = "Invalid Username/Password"
                                 }
                             }
                         } catch (e: Exception) {
                             println("Error: ${e.message}")
+                            showErrorMessage = true
+                            errorText = "Unable to connect to DB"
                         } finally {
                             httpClient.close()
                         }
