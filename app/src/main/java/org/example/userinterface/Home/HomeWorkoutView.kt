@@ -179,7 +179,7 @@ fun HomeWorkoutView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(70.dp)
-                        .padding(0.dp, 10.dp),
+                        .padding(0.dp, 10.dp)
                 ) {
                     Text(
                         text = "Last Set",
