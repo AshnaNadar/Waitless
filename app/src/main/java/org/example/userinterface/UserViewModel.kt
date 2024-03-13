@@ -22,6 +22,8 @@ class UserViewModel(val model: UserModel) : ISubscriber {
 
     init {
         model.subscribe(this)
+        model.fetchDatabaseStuff()
+//        model.fetchQueueAPIdata()
     }
 
     override fun update() {
