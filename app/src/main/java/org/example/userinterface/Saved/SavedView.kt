@@ -3,17 +3,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,6 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.example.controller.UserController
@@ -34,13 +44,68 @@ import org.example.theme.DarkGreen
 import org.example.theme.*
 import org.example.theme.LightGrey
 import org.example.theme.Typography
+import org.example.userinterface.Home.rememberInfo
 import org.example.userinterface.UserViewModel
+
+// add button: https://www.composables.com/icons
+@Composable
+fun rememberAdd(): ImageVector {
+    return remember {
+        ImageVector.Builder(
+            name = "add",
+            defaultWidth = 40.0.dp,
+            defaultHeight = 40.0.dp,
+            viewportWidth = 40.0f,
+            viewportHeight = 40.0f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(20f, 31.458f)
+                quadToRelative(-0.542f, 0f, -0.917f, -0.396f)
+                quadToRelative(-0.375f, -0.395f, -0.375f, -0.937f)
+                verticalLineToRelative(-8.833f)
+                horizontalLineTo(9.875f)
+                quadToRelative(-0.583f, 0f, -0.958f, -0.375f)
+                reflectiveQuadTo(8.542f, 20f)
+                quadToRelative(0f, -0.583f, 0.375f, -0.958f)
+                reflectiveQuadToRelative(0.958f, -0.375f)
+                horizontalLineToRelative(8.833f)
+                verticalLineTo(9.833f)
+                quadToRelative(0f, -0.541f, 0.375f, -0.916f)
+                reflectiveQuadTo(20f, 8.542f)
+                quadToRelative(0.542f, 0f, 0.938f, 0.375f)
+                quadToRelative(0.395f, 0.375f, 0.395f, 0.916f)
+                verticalLineToRelative(8.834f)
+                horizontalLineToRelative(8.792f)
+                quadToRelative(0.583f, 0f, 0.958f, 0.395f)
+                quadToRelative(0.375f, 0.396f, 0.375f, 0.938f)
+                quadToRelative(0f, 0.542f, -0.375f, 0.917f)
+                reflectiveQuadToRelative(-0.958f, 0.375f)
+                horizontalLineToRelative(-8.792f)
+                verticalLineToRelative(8.833f)
+                quadToRelative(0f, 0.542f, -0.395f, 0.937f)
+                quadToRelative(-0.396f, 0.396f, -0.938f, 0.396f)
+                close()
+            }
+        }.build()
+    }
+}
 
 @Composable
 fun SavedView(
     userViewModel: UserViewModel,
     userController: UserController,
-    onEditWorkoutClicked: () -> Unit = {}
+    onEditWorkoutClicked: () -> Unit = {},
+    onCreateWorkoutClicked: () -> Unit = {}
 ) {
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
@@ -52,11 +117,40 @@ fun SavedView(
                 .background(Background)
                 .padding(top = 80.dp, start = 20.dp, end = 20.dp)
         ) {
-            /* Page Title */
-            Text(
-                text = "Saved Workouts",
-                style = Typography.headlineMedium,
-            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                /* Page Title */
+                Text(
+                    text = "Saved Workouts",
+                    style = Typography.headlineMedium,
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                /*
+                Add Button
+                    - creates empty Workout and adds to savedWorkouts
+                    - routes to addable equipment list
+                */
+                Button(
+                    onClick = {
+                        viewModel.addNewWorkout()
+                        onCreateWorkoutClicked() },
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    modifier = Modifier.size(30.dp),
+                    contentPadding = PaddingValues(0.dp),
+                ) {
+                    Icon(
+                        imageVector = rememberAdd(),
+                        contentDescription = "edit",
+                        modifier = Modifier.size(20.dp),
+                        tint = DarkGrey
+                    )
+                }
+            }
 
             Column( // Scrollable column to go through saved workouts
                 verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -64,7 +158,7 @@ fun SavedView(
                     .verticalScroll(rememberScrollState())
                     .weight(1f, false)
             ) {
-                viewModel.savedWorkouts.value.forEach { (workoutName, machines) ->
+                viewModel.savedWorkouts.value.forEach { workout ->
                     Row( // Workout display (box)
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -77,7 +171,7 @@ fun SavedView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = workoutName,
+                                text = workout.name,
                                 style = Typography.bodyLarge
                             )
                             Button(
@@ -98,7 +192,7 @@ fun SavedView(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = machines.size.toString(),
+                                text = workout.machines.size.toString(),
                                 style = Typography.bodyLarge
                             )
                             Text(

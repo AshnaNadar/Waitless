@@ -3,6 +3,7 @@ package org.example.userinterface
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import org.example.model.UserModel
+import org.example.model.Workout
 
 // Read all values needed in the UI from here
 
@@ -11,13 +12,16 @@ class UserViewModel(val model: UserModel) : ISubscriber {
     var password = mutableStateOf("")
 
     // Home Page
-    var selectedWorkout = mutableStateOf("") // Empty if no workout selected
+    var selectedWorkout = mutableStateOf(Workout("", mutableListOf<String>())) // Empty if no workout selected
 
     // Queue Management Stuff
     var userQueueCount = mutableIntStateOf(12)
 
+    // Saved Workouts
+    var creatingWorkout = mutableStateOf(false)
+
     // Database Stuff
-    var savedWorkouts = mutableStateOf(emptyMap<String, List<String>>())
+        var savedWorkouts = mutableStateOf(emptyList<Workout>())
     var allMachineNames = mutableStateOf(emptyList<String>())
 
     init {
@@ -26,12 +30,17 @@ class UserViewModel(val model: UserModel) : ISubscriber {
 //        model.fetchQueueAPIdata()
     }
 
+    fun addNewWorkout() {
+        model.addNewWorkout()
+    }
+
     override fun update() {
         username.value = model.username
         password.value = model.password
 
         selectedWorkout.value = model.selectedWorkout
         userQueueCount.intValue = model.userQueueCount
+        creatingWorkout.value = model.creatingWorkout
 
         // Database Stuff
         savedWorkouts.value = model.savedWorkouts

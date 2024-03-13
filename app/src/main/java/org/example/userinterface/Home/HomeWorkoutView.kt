@@ -72,7 +72,7 @@ fun HomeWorkoutView(
     var upcomingMachines by remember { mutableStateOf(listOf<String>()) }
     var currentMachine by remember { mutableStateOf("") }
 
-    currentWorkoutList = viewModel.savedWorkouts.value[viewModel.selectedWorkout.value] ?: emptyList()
+    currentWorkoutList = viewModel.selectedWorkout.value.machines ?: emptyList()
     upcomingMachines = currentWorkoutList.toMutableList()
     if (upcomingMachines.isNotEmpty()) {
         currentMachine = upcomingMachines.first()

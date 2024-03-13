@@ -279,7 +279,7 @@ fun HomeView(
                     style = Typography.headlineMedium
                 )
 
-                if (viewModel.selectedWorkout.value == "") { // no workout selected
+                if (viewModel.selectedWorkout.value.name == "") { // no workout selected
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -309,7 +309,7 @@ fun HomeView(
                 modifier = Modifier
                     .heightIn(120.dp)
             ) {
-                if (viewModel.selectedWorkout.value == "") { // No workout selected
+                if (viewModel.selectedWorkout.value.name == "") { // No workout selected
                     /* Label visible if no workout selected.*/
                     Text(
                         text = "No active workout - start one now!",
@@ -358,7 +358,7 @@ fun HomeView(
                                 horizontalAlignment = Alignment.Start
                             ) {
                                 Text(
-                                    text = viewModel.selectedWorkout.value,
+                                    text = viewModel.selectedWorkout.value.name,
                                     style = Typography.bodyLarge
                                 )
                             }
@@ -367,7 +367,7 @@ fun HomeView(
                                 horizontalAlignment = Alignment.End
                             ) {
                                 Text(
-                                    text = viewModel.savedWorkouts.value[viewModel.selectedWorkout.value]?.size.toString(),
+                                    text = viewModel.selectedWorkout.value.machines.size.toString(),
                                     style = Typography.bodyLarge
                                 )
                                 Text(
@@ -435,13 +435,13 @@ fun HomeView(
                     .weight(1f, false)
             ) {
 
-                viewModel.savedWorkouts.value.forEach { (workoutName, machines) ->
+                viewModel.savedWorkouts.value.forEach { workout ->
                     Row( // Workout display (box)
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .clickable {
-                                viewModel.selectedWorkout.value = workoutName // need to invoke controller?
+                                viewModel.selectedWorkout.value = workout // need to invoke controller?
                             }
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
@@ -452,7 +452,7 @@ fun HomeView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = workoutName,
+                                text = workout.name,
                                 style = Typography.bodyLarge
                             )
                         }
@@ -461,7 +461,7 @@ fun HomeView(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = machines.size.toString(),
+                                text = workout.machines.size.toString(),
                                 style = Typography.bodyLarge
                             )
                             Text(

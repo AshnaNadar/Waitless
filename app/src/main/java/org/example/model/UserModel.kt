@@ -6,6 +6,10 @@ import android.util.Log
 
 // All the values are stored here. UserController invokes this
 
+data class Workout(
+    val name: String,
+    val machines: MutableList<String>
+)
 class UserModel : IPresenter() {
 
     var username: String = ""
@@ -22,15 +26,22 @@ class UserModel : IPresenter() {
 
     var userid: String = "20871851"
 
+    // Saved Workout Stuff
+    var creatingWorkout: Boolean = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
     // Queue API Stuff
     var userQueueCount: Int = 10
 
     // Database Stuff
-    var savedWorkouts: Map<String, List<String>> = emptyMap()
+    var savedWorkouts: MutableList<Workout> = emptyList<Workout>().toMutableList()
     var allMachineNames: List<String> = emptyList()
 
     // Home Screen
-    var selectedWorkout: String = ""
+    var selectedWorkout: Workout = Workout("", mutableListOf<String>())
         set(value) {
             field = value
             notifySubscribers()
@@ -72,39 +83,57 @@ class UserModel : IPresenter() {
             "Smithmachine",
             "Hacksquatmachine"
         )
-        savedWorkouts = mapOf(
-            "Cardio Blast" to listOf(
-                "Treadmill",
-                "Stationarybike",
-                "Ellipticaltrainer"
+
+        savedWorkouts = mutableListOf(
+            Workout("Cardio Blast",
+                mutableListOf(
+                    "Treadmill",
+                    "Stationarybike",
+                    "Ellipticaltrainer")
             ),
-            "Upper Body Sculpt" to listOf(
-                "Smith machine",
-                "Chestpress",
-                "Latpulldownmachine",
-                "Shoulderpressmachine",
-                "Dumbbellrack"
+            Workout("Upper Body Sculpt",
+                mutableListOf(
+                    "Smith machine",
+                    "Chestpress",
+                    "Latpulldownmachine",
+                    "Shoulderpressmachine",
+                    "Dumbbellrack"
+                )),
+            Workout("Leg Day",
+                mutableListOf(
+                    "Legpressmachine",
+                    "Legextensionmachine",
+                    "Legcurlmachine",
+                    "Seatedcalfraisemachine",
+                    "Hacksquatmachine")
             ),
-            "Leg Day" to listOf(
-                "Legpressmachine",
-                "Legextensionmachine",
-                "Legcurlmachine",
-                "Seatedcalfraisemachine",
-                "Hacksquatmachine"
+            Workout("Full Body Burn",
+                mutableListOf(
+                    "Rowingmachine",
+                    "Cablecrossovermachine",
+                    "Adjustablebench",
+                    "Abdominalcrunchmachine",
+                    "Hipabduction/adductionmachine")
             ),
-            "Full Body Burn" to listOf(
-                "Rowingmachine",
-                "Cablecrossovermachine",
-                "Adjustablebench",
-                "Abdominalcrunchmachine",
-                "Hipabduction/adductionmachine"
-            ),
-            "Strength and Stability" to listOf(
-                "Assistedpull-up/dipmachine",
-                "Smith machine"
+            Workout("Strength and Stability",
+                mutableListOf(
+                    "Assistedpull-up/dipmachine",
+                    "Smith machine")
             )
         )
+
         notifySubscribers()
+    }
+
+    // creates empty Workout and adds it to savedWorkouts
+    fun addNewWorkout() {
+        creatingWorkout = true
+        savedWorkouts.add(Workout("", mutableListOf<String>()))
+    }
+
+    // adds machine to last Workout in savedWorkouts
+    fun addMachine(machine: String) {
+        savedWorkouts[savedWorkouts.lastIndex].machines.add(machine)
     }
     
 }
