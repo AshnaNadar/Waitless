@@ -7,6 +7,7 @@ import android.util.Log
 // All the values are stored here. UserController invokes this
 
 class UserModel : IPresenter() {
+
     var username: String = ""
         set(value) {
             field = value
@@ -35,12 +36,8 @@ class UserModel : IPresenter() {
             notifySubscribers()
         }
 
-    init {
-        fetchQueueAPIdata()
-        fetchDatabaseStuff()
-    }
 
-    private fun fetchQueueAPIdata() {
+    fun fetchQueueAPIdata() {
         addUser(userid) { _ ->
             getUserQueues(userid) { response ->
                 userQueueCount = response.body()?.count ?: 0
@@ -49,7 +46,7 @@ class UserModel : IPresenter() {
         }
     }
 
-    private fun fetchDatabaseStuff() {
+    fun fetchDatabaseStuff() {
         // add calls to Supabase here to get workouts, machine info, etc
 
         // temporarily hardcoding values for testing:
@@ -107,7 +104,6 @@ class UserModel : IPresenter() {
                 "Smith machine"
             )
         )
-
         notifySubscribers()
     }
     
