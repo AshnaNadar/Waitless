@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -38,17 +36,22 @@ import org.example.userinterface.MenuBarOptions
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import org.example.controller.UserController
+import org.example.userinterface.UserViewModel
 import org.example.theme.* // import all colors and themes
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview
 @Composable
-fun WaitlessApp(
-    navController: NavHostController = rememberNavController()
-) {
+fun WaitlessApp(userViewModel: UserViewModel, userController: UserController,
+                navController: NavHostController = rememberNavController()) {
+
+    val viewModel by remember { mutableStateOf(userViewModel) }
+    val controller by remember { mutableStateOf(userController) }
+
     var showNav by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     showNav = when (navBackStackEntry?.destination?.route) {
@@ -69,7 +72,7 @@ fun WaitlessApp(
         }
     )
     {
-        MenuBarGraph(navController = navController)
+        MenuBarGraph(navController = navController, userViewModel = viewModel, userController = controller)
     }
 }
 

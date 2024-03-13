@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,7 +45,9 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.controller.UserController
 import org.example.theme.*
+import org.example.userinterface.UserViewModel
 
 // info button: https://www.composables.com/icons
 @Composable
@@ -240,15 +243,17 @@ fun rememberStopCircle(): ImageVector {
     }
 }
 
-@Preview
 @Composable
 fun HomeView(
+    userViewModel: UserViewModel,
+    userController: UserController,
     onInfoClicked: () -> Unit = {},
     onSeeAllClicked: () -> Unit = {},
     onStartClicked: () -> Unit = {},
 ) {
-    // 0 when no workout selected, workout ID otherwise (1...n for now)
-    var selectedWorkout by remember { mutableIntStateOf(0) }
+
+    val viewModel by remember { mutableStateOf(userViewModel) }
+    val controller by remember { mutableStateOf(userController) }
 
     Box(
         modifier = Modifier
@@ -274,7 +279,7 @@ fun HomeView(
                     style = Typography.headlineMedium
                 )
 
-                if (selectedWorkout != 0) { // no workout selected
+                if (viewModel.selectedWorkout.value == "") { // no workout selected
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -304,7 +309,7 @@ fun HomeView(
                 modifier = Modifier
                     .heightIn(120.dp)
             ) {
-                if (selectedWorkout == 0) { // No workout selected
+                if (viewModel.selectedWorkout.value == "") { // No workout selected
                     /* Label visible if no workout selected.*/
                     Text(
                         text = "No active workout - start one now!",
@@ -353,7 +358,7 @@ fun HomeView(
                                 horizontalAlignment = Alignment.Start
                             ) {
                                 Text(
-                                    text = "Sample Workout #$selectedWorkout",
+                                    text = viewModel.selectedWorkout.value,
                                     style = Typography.bodyLarge
                                 )
                             }
@@ -362,7 +367,7 @@ fun HomeView(
                                 horizontalAlignment = Alignment.End
                             ) {
                                 Text(
-                                    text = "X",
+                                    text = viewModel.savedWorkouts.value[viewModel.selectedWorkout.value]?.size.toString(),
                                     style = Typography.bodyLarge
                                 )
                                 Text(
@@ -430,12 +435,14 @@ fun HomeView(
                     .weight(1f, false)
             ) {
 
-                for (i in 1..7) { // TMP: to fill screen
-                    Row ( // Workout display (box)
+                viewModel.savedWorkouts.value.forEach { (workoutName, machines) ->
+                    Row( // Workout display (box)
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .clickable { selectedWorkout= i }
+                            .clickable {
+                                viewModel.selectedWorkout.value = workoutName // need to invoke controller?
+                            }
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
                             .background(LightGrey)
@@ -445,7 +452,7 @@ fun HomeView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = "Sample Workout #$i",
+                                text = workoutName,
                                 style = Typography.bodyLarge
                             )
                         }
@@ -454,7 +461,7 @@ fun HomeView(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = "X",
+                                text = machines.size.toString(),
                                 style = Typography.bodyLarge
                             )
                             Text(

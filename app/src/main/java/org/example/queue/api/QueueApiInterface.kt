@@ -1,6 +1,6 @@
 // This file defines the API interface for the Queue Management API using Retrofit
 
-import org.example.QueueData
+import org.example.queue.api.QueueData
 import retrofit2.Call
 import retrofit2.http.*
 

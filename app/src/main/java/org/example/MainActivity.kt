@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import org.example.theme.WaitlessTheme
 import org.example.controller.UserController
 import org.example.model.UserModel
-import org.example.model.UserViewModel
+import org.example.userinterface.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,8 +18,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             WaitlessTheme {
-                WaitlessApp()
-                //UserView(userViewModel, userController)
+                WaitlessApp(userViewModel, userController)
             }
         }
     }
