@@ -1,7 +1,9 @@
 package org.example.model
 
 import androidx.compose.runtime.mutableStateOf
+import org.example.userinterface.ISubscriber
 
+// This file is NOT being used
 class LoginViewModel(val model: UserModel) : ISubscriber {
     var username = mutableStateOf("")
     var password = mutableStateOf("")

@@ -28,6 +28,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.example.controller.UserController
 import org.example.theme.Background
 import org.example.theme.DarkGreen
 import org.example.theme.GreyText
@@ -49,14 +55,30 @@ import org.example.theme.PurpleGrey40
 import org.example.theme.PurpleGrey80
 import org.example.theme.Typography
 import org.example.userinterface.Equipment.EquipmentView
+import org.example.userinterface.UserViewModel
 
-@Preview
 @Composable
 fun HomeWorkoutView(
+    userViewModel: UserViewModel,
+    userController: UserController,
     onStopWorkoutClicked: () -> Unit = {},
     onLastSetClicked: () -> Unit = {},
     onEquipmentInfoClicked: () -> Unit = {}
 ) {
+    val viewModel by remember { mutableStateOf(userViewModel) }
+    val controller by remember { mutableStateOf(userController) }
+
+    var currentWorkoutList by remember { mutableStateOf(listOf<String>()) }
+    var upcomingMachines by remember { mutableStateOf(listOf<String>()) }
+    var currentMachine by remember { mutableStateOf("") }
+
+    currentWorkoutList = viewModel.savedWorkouts.value[viewModel.selectedWorkout.value] ?: emptyList()
+    upcomingMachines = currentWorkoutList.toMutableList()
+    if (upcomingMachines.isNotEmpty()) {
+        currentMachine = upcomingMachines.first()
+        upcomingMachines = upcomingMachines.drop(1)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -129,7 +151,7 @@ fun HomeWorkoutView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = "Sample Machine",
+                                text = currentMachine,
                                 style = Typography.bodyLarge
                             )
 
@@ -221,7 +243,7 @@ fun HomeWorkoutView(
                     .weight(1f, false)
             ) {
 
-                for (i in 1..7) { // TMP: to fill screen
+                upcomingMachines.forEach { machine ->
                     Row ( // Workout display (box)
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -235,7 +257,7 @@ fun HomeWorkoutView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = "Sample Machine #$i",
+                                text = machine,
                                 style = Typography.bodyLarge
                             )
 

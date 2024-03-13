@@ -18,6 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,16 +28,23 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.example.controller.UserController
 import org.example.theme.Background
 import org.example.theme.DarkGreen
 import org.example.theme.*
 import org.example.theme.LightGrey
 import org.example.theme.Typography
+import org.example.userinterface.UserViewModel
 
 @Composable
 fun SavedView(
+    userViewModel: UserViewModel,
+    userController: UserController,
     onEditWorkoutClicked: () -> Unit = {}
 ) {
+    val viewModel by remember { mutableStateOf(userViewModel) }
+    val controller by remember { mutableStateOf(userController) }
+
     Box() {
         Column(
             modifier = Modifier
@@ -54,8 +64,7 @@ fun SavedView(
                     .verticalScroll(rememberScrollState())
                     .weight(1f, false)
             ) {
-
-                for (i in 1..7) { // TMP: to fill screen
+                viewModel.savedWorkouts.value.forEach { (workoutName, machines) ->
                     Row( // Workout display (box)
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -68,7 +77,7 @@ fun SavedView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = "Sample Workout",
+                                text = workoutName,
                                 style = Typography.bodyLarge
                             )
                             Button(
@@ -89,7 +98,7 @@ fun SavedView(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = "X",
+                                text = machines.size.toString(),
                                 style = Typography.bodyLarge
                             )
                             Text(

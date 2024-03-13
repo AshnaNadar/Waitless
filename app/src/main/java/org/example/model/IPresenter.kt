@@ -1,5 +1,8 @@
 package org.example.model
 
+import org.example.userinterface.ISubscriber
+
+// Interface used by UserModel
 abstract class IPresenter {
     private val subscribers = mutableListOf<ISubscriber>()
     fun notifySubscribers() {
