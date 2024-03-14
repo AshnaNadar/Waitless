@@ -321,10 +321,12 @@ fun HomeView(
                     /*
                     Add machines button
                         - visible if no workout selected
-                        - creates a temporary workout (not added to saved workouts)
+                        - creates a saved workout
                     */
                     Button(
-                        onClick = onInfoClicked,
+                        onClick = {
+                            viewModel.addNewWorkout()
+                            onInfoClicked() },
                         colors = ButtonDefaults.buttonColors(DarkGreen),
                         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
                         modifier = Modifier

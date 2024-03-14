@@ -7,7 +7,7 @@ import android.util.Log
 // All the values are stored here. UserController invokes this
 
 data class Workout(
-    val name: String,
+    var name: String,
     val machines: MutableList<String>
 )
 class UserModel : IPresenter() {
@@ -120,6 +120,7 @@ class UserModel : IPresenter() {
                     "Assistedpull-up/dipmachine",
                     "Smith machine")
             )
+
         )
 
         notifySubscribers()
@@ -131,9 +132,49 @@ class UserModel : IPresenter() {
         savedWorkouts.add(Workout("", mutableListOf<String>()))
     }
 
-    // adds machine to last Workout in savedWorkouts
-    fun addMachine(machine: String) {
-        savedWorkouts[savedWorkouts.lastIndex].machines.add(machine)
+    // adds name to last created saved workout
+    // ends creating workout process
+    fun addWorkoutName(workoutName: String) {
+        savedWorkouts[savedWorkouts.lastIndex].name = workoutName
+        creatingWorkout = false
+    }
+
+    // removes last saved workout
+    fun removeWorkout() {
+        creatingWorkout = true
+        savedWorkouts.removeAt(savedWorkouts.lastIndex)
+    }
+
+    // adds machine to workoutName
+    // or last Workout in savedWorkouts if not specified
+    fun addMachine(machine: String, workoutName: String? = null) {
+        var index = savedWorkouts.lastIndex
+
+        if (workoutName != null) {
+            savedWorkouts.forEachIndexed { i, workout ->
+                if (workout.name == workoutName) {
+                    index = i
+                }
+            }
+        }
+
+        savedWorkouts[index].machines.add(machine)
+    }
+
+    // removes machine to workoutName
+    // or last Workout in savedWorkouts if not specified
+    fun removeMachine(machine: String, workoutName: String? = null) {
+        var index = savedWorkouts.lastIndex
+
+        if (workoutName != null) {
+            savedWorkouts.forEachIndexed { i, workout ->
+                if (workout.name == workoutName) {
+                    index = i
+                }
+            }
+        }
+
+        savedWorkouts[index].machines.remove(machine)
     }
     
 }

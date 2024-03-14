@@ -34,6 +34,21 @@ class UserViewModel(val model: UserModel) : ISubscriber {
         model.addNewWorkout()
     }
 
+    fun addWorkoutName(workoutName: String) {
+        model.addWorkoutName(workoutName)
+    }
+
+    fun removeWorkout() {
+        model.removeWorkout()
+    }
+    fun addMachine(machine: String) {
+        model.addMachine(machine)
+    }
+
+    fun removeMachine(machine: String) {
+        model.removeMachine(machine)
+    }
+
     override fun update() {
         username.value = model.username
         password.value = model.password

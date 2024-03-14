@@ -1,5 +1,10 @@
 package org.example.userinterface.Equipment
+import android.R
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,17 +23,31 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,28 +56,41 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.navigation.compose.rememberNavController
 import org.example.controller.UserController
 import org.example.theme.Background
 import org.example.theme.DarkGreen
 import org.example.theme.DarkGrey
+import org.example.theme.GreyText
 import org.example.theme.LightGreen
 import org.example.theme.LightGrey
 import org.example.theme.Typography
 import org.example.userinterface.Home.rememberPlayArrow
+import org.example.userinterface.Login.rememberClose
 import org.example.userinterface.MenuBarOptions
 import org.example.userinterface.Saved.rememberAdd
 import org.example.userinterface.UserViewModel
 
+
+// checkmark/done button: https://www.composables.com/icons
 @Composable
 fun rememberDone(): ImageVector {
     return remember {
@@ -102,14 +135,55 @@ fun rememberDone(): ImageVector {
     }
 }
 
+// remove button: https://www.composables.com/icons
+@Composable
+fun rememberRemove(): ImageVector {
+    return remember {
+        ImageVector.Builder(
+            name = "remove",
+            defaultWidth = 40.0.dp,
+            defaultHeight = 40.0.dp,
+            viewportWidth = 40.0f,
+            viewportHeight = 40.0f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(9.833f, 21.292f)
+                quadToRelative(-0.541f, 0f, -0.916f, -0.375f)
+                reflectiveQuadToRelative(-0.375f, -0.959f)
+                quadToRelative(0f, -0.541f, 0.375f, -0.916f)
+                reflectiveQuadToRelative(0.916f, -0.375f)
+                horizontalLineToRelative(20.334f)
+                quadToRelative(0.541f, 0f, 0.916f, 0.395f)
+                quadToRelative(0.375f, 0.396f, 0.375f, 0.938f)
+                quadToRelative(0f, 0.542f, -0.375f, 0.917f)
+                reflectiveQuadToRelative(-0.916f, 0.375f)
+                close()
+            }
+        }.build()
+    }
+}
+
 @Composable
 fun EquipmentView(
     userViewModel: UserViewModel,
     userController: UserController,
-    onEquipmentClicked: () -> Unit = {}
+    onEquipmentClicked: () -> Unit = {},
+    onDoneSelectingClicked: () -> Unit = {}
 ) {
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
+    var showNameWorkoutDialog by remember { mutableStateOf(false)}
+    val showDialog = remember { mutableStateOf(false) }
 
     Box() {
         Column(
@@ -138,7 +212,7 @@ fun EquipmentView(
                         - goes back to saved workout/home page
                     */
                     Button(
-                        onClick = { },
+                        onClick = { showDialog.value = true },
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(Color.Transparent),
                         modifier = Modifier.size(30.dp),
@@ -149,6 +223,21 @@ fun EquipmentView(
                             contentDescription = "edit",
                             modifier = Modifier.size(20.dp),
                             tint = DarkGrey
+                        )
+                    }
+
+                    if(showDialog.value){
+                        NameWorkoutDialog(
+                            onDismissRequest = {
+                                showDialog.value = false
+                                onDoneSelectingClicked()
+                                viewModel.removeWorkout() },
+                            onConfirmation = {
+                                showDialog.value = false
+                                onDoneSelectingClicked()
+                                viewModel.addWorkoutName(it) },
+                            workoutName = "",
+                            setShowDialog = { showDialog.value = it }
                         )
                     }
                 }
@@ -173,20 +262,38 @@ fun EquipmentView(
                             Add button
                                 - adds machine to last Workout in savedWorkouts
                             */
-                            Button(
-                                onClick = { },
-                                shape = CircleShape,
-                                colors = ButtonDefaults.buttonColors(DarkGreen),
+                            var machineAdded by remember { mutableStateOf(false) }
+                            
+                            IconButton(
+                                onClick = {
+                                    if (!machineAdded) {
+                                        viewModel.addMachine(machineName)
+                                    } else {
+                                        viewModel.removeMachine(machineName)
+                                    }
+                                    machineAdded = !machineAdded
+                                          },
+                                colors = if (!machineAdded) {
+                                    IconButtonDefaults.iconButtonColors(DarkGreen)
+                                } else {
+                                    IconButtonDefaults.iconButtonColors(DarkGrey)
+                                },
                                 modifier = Modifier
                                     .shadow(5.dp, CircleShape)
                                     .size(40.dp),
-                                contentPadding = PaddingValues(0.dp),
                             ) {
-                                Icon(
-                                    imageVector = rememberAdd(),
-                                    contentDescription = "add machine",
-                                    modifier = Modifier.size(30.dp),
-                                )
+                                Image(
+                                    imageVector = if (!machineAdded) {
+                                        rememberAdd()
+                                    } else {
+                                        rememberRemove() },
+                                    contentDescription = if (!machineAdded) {
+                                        "add machine"
+                                    } else {
+                                        "remove machine" },
+                                    colorFilter = ColorFilter.tint(Color.White),
+                                    modifier = Modifier
+                                        .size(30.dp))
                             }
 
                             Spacer(modifier = Modifier.width(10.dp))
@@ -275,3 +382,111 @@ fun EquipmentView(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NameWorkoutDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: (String) -> Unit,
+    setShowDialog: (Boolean) -> Unit,
+    workoutName: String
+) {
+    val textField = remember { mutableStateOf(workoutName) }
+    var showErrorMessage by remember { mutableStateOf(false) }
+    var errorText by remember { mutableStateOf("") }
+
+    Dialog(
+        onDismissRequest = {
+            onDismissRequest()
+        }
+    ) {
+
+        Surface (
+            shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+            color = LightGrey
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp)
+            ) {
+
+                Row {
+                    Text(text = "Name Your Workout")
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    /*
+                    Close Button
+                        - deletes workout being created
+                        - goes back to prev page (home or saved workouts)
+                    */
+                    Button(
+                        // close button
+                        onClick = { onDismissRequest() },
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        modifier = Modifier.size(40.dp),
+                        contentPadding = PaddingValues(0.dp),
+                    ) {
+                        Icon(
+                            imageVector = rememberClose(),
+                            contentDescription = "close",
+                            modifier = Modifier.size(30.dp),
+                            tint = GreyText
+                        )
+                    }
+                }
+
+                OutlinedTextField(
+                    textField.value,
+                    label = {Text(
+                        text = "Enter workout name",
+                        color = GreyText)},
+                    onValueChange = { textField.value = it },
+                    shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                    textStyle = TextStyle(color = DarkGrey),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = DarkGrey,
+                        unfocusedBorderColor = GreyText,
+                    ),
+                    supportingText = {
+                        if (showErrorMessage) {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = errorText,
+                                color = Color.Red
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(70.dp)
+                        .padding(0.dp, 10.dp)
+                )
+
+                Button(
+                    onClick = {
+                        if (textField.value.isEmpty()) {
+                            showErrorMessage = true
+                            errorText = "Field can not be empty"
+                            return@Button
+                        }
+                        onConfirmation(textField.value)
+                        setShowDialog(false)
+                    },
+                    colors = ButtonDefaults.buttonColors(DarkGreen),
+                    shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(70.dp)
+                        .padding(0.dp, 10.dp)
+                ) {
+                    Text(
+                        text = "Done",
+                        style = Typography.bodyMedium
+                    )
+                }
+
+            }
+        }
+
+    }
+}

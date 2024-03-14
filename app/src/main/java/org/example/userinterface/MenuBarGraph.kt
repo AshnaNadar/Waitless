@@ -60,6 +60,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
         composable(route = MenuBarOptions.Equipment.route) {
             EquipmentView(
                 onEquipmentClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) },
+                onDoneSelectingClicked = { navController.popBackStack() },
                 userViewModel = viewModel,
                 userController = controller)
         }
