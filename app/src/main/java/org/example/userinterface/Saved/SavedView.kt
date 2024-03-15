@@ -177,7 +177,8 @@ fun SavedView(
                                 viewModel.selectedWorkout.value = workout
                                 viewModel.editingWorkout.value = true
                                 onEditWorkoutClicked()
-                            }
+                            },
+                            enabled = false
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Create,

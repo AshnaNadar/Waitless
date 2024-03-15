@@ -214,7 +214,12 @@ fun EquipmentView(
                     Button(
                         onClick = {
                             if (viewModel.creatingWorkout.value) {
-                                showDialog.value = true
+                                if (viewModel.savedWorkouts.value.last().machines.isEmpty()) {
+                                    viewModel.removeWorkout() // no machines selected (don't create an empty workout)
+                                    onDoneSelectingClicked()
+                                } else {
+                                    showDialog.value = true
+                                }
                             } else { // editing state, apply changes to selectedWorkout
                                 viewModel.editWorkout()
                                 onDoneSelectingClicked()
