@@ -202,40 +202,47 @@ fun EquipmentView(
                     style = Typography.headlineMedium,
                 )
 
-                if (viewModel.creatingWorkout.value) { // if creating workout
+                if (viewModel.creatingWorkout.value || viewModel.editingWorkout.value) { // if creating/editing workout
 
                     Spacer(modifier = Modifier.weight(1f))
 
                     /*
-                    Done Button
-                        - prompts user to name workout
+                    Checkmark/Done Button
+                        - prompts user to name workout if creating new workout
                         - goes back to saved workout/home page
                     */
                     Button(
-                        onClick = { showDialog.value = true },
+                        onClick = {
+                            if (viewModel.creatingWorkout.value) {
+                                showDialog.value = true
+                            } else { // editing state, apply changes to selectedWorkout
+                                viewModel.editWorkout()
+                                onDoneSelectingClicked()
+                            } },
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(Color.Transparent),
                         modifier = Modifier.size(30.dp),
                         contentPadding = PaddingValues(0.dp),
+                        //enabled =
                     ) {
                         Icon(
                             imageVector = rememberDone(),
-                            contentDescription = "edit",
-                            modifier = Modifier.size(20.dp),
+                            contentDescription = "done",
+                            modifier = Modifier.size(30.dp),
                             tint = DarkGrey
                         )
                     }
 
-                    if(showDialog.value){
+                    if (showDialog.value) {
                         NameWorkoutDialog(
-                            onDismissRequest = {
-                                showDialog.value = false
+                            onDismissRequest = { // cancel (don't add new workout)
+                                viewModel.removeWorkout()
                                 onDoneSelectingClicked()
-                                viewModel.removeWorkout() },
+                                showDialog.value = false },
                             onConfirmation = {
-                                showDialog.value = false
+                                viewModel.addWorkoutName(it)
                                 onDoneSelectingClicked()
-                                viewModel.addWorkoutName(it) },
+                                showDialog.value = false },
                             workoutName = "",
                             setShowDialog = { showDialog.value = it }
                         )
@@ -257,12 +264,16 @@ fun EquipmentView(
                     ) {
 
 
-                        if (viewModel.creatingWorkout.value) { // if creating workout
+                        if (viewModel.creatingWorkout.value || viewModel.editingWorkout.value) { // if creating/editing workout
                             /*
                             Add button
                                 - adds machine to last Workout in savedWorkouts
                             */
                             var machineAdded by remember { mutableStateOf(false) }
+
+                            if (viewModel.editingWorkout.value) {
+                                machineAdded = remember { viewModel.selectedWorkout.value.machines.contains(machineName) }
+                            }
                             
                             IconButton(
                                 onClick = {
@@ -271,8 +282,7 @@ fun EquipmentView(
                                     } else {
                                         viewModel.removeMachine(machineName)
                                     }
-                                    machineAdded = !machineAdded
-                                          },
+                                    machineAdded = !machineAdded },
                                 colors = if (!machineAdded) {
                                     IconButtonDefaults.iconButtonColors(DarkGreen)
                                 } else {
@@ -306,7 +316,6 @@ fun EquipmentView(
 
                                 }
                                 .fillMaxWidth()
-                                .heightIn(40.dp)
                                 .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
                                 .background(LightGrey)
                                 .padding(10.dp)
@@ -325,7 +334,6 @@ fun EquipmentView(
                                 */
                                 TextButton(
                                     onClick = onEquipmentClicked,
-                                    // colors = ButtonDefaults.buttonColors(LightGreen)
                                 ) {
                                     Text(
                                         modifier = Modifier.drawBehind {

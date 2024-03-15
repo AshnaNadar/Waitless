@@ -1,5 +1,7 @@
 package org.example.userinterface.Saved
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,18 +11,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +40,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.example.controller.UserController
 import org.example.theme.Background
@@ -44,7 +47,6 @@ import org.example.theme.DarkGreen
 import org.example.theme.*
 import org.example.theme.LightGrey
 import org.example.theme.Typography
-import org.example.userinterface.Home.rememberInfo
 import org.example.userinterface.UserViewModel
 
 // add button: https://www.composables.com/icons
@@ -100,6 +102,7 @@ fun rememberAdd(): ImageVector {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SavedView(
     userViewModel: UserViewModel,
@@ -111,54 +114,56 @@ fun SavedView(
     val controller by remember { mutableStateOf(userController) }
 
     Box() {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Background)
                 .padding(top = 80.dp, start = 20.dp, end = 20.dp)
         ) {
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                /* Page Title */
-                Text(
-                    text = "Saved Workouts",
-                    style = Typography.headlineMedium,
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                /*
-                Add Button
-                    - creates empty Workout and adds to savedWorkouts
-                    - routes to addable equipment list
-                */
-                Button(
-                    onClick = {
-                        viewModel.addNewWorkout()
-                        onCreateWorkoutClicked() },
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(Color.Transparent),
-                    modifier = Modifier.size(30.dp),
-                    contentPadding = PaddingValues(0.dp),
-                ) {
-                    Icon(
-                        imageVector = rememberAdd(),
-                        contentDescription = "edit",
-                        modifier = Modifier.size(20.dp),
-                        tint = DarkGrey
-                    )
-                }
-            }
-
-            Column( // Scrollable column to go through saved workouts
+            LazyColumn( // Scrollable column to go through saved workouts
                 verticalArrangement = Arrangement.spacedBy(15.dp),
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .weight(1f, false)
+                userScrollEnabled = true,
             ) {
-                viewModel.savedWorkouts.value.forEach { workout ->
+
+                /* TOP SECTION */
+                stickyHeader {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        /* Page Title */
+                        Text(
+                            text = "Saved Workouts",
+                            style = Typography.headlineMedium,
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        /*
+                        Add Button
+                            - creates empty Workout and adds to savedWorkouts
+                            - routes to addable equipment list
+                        */
+                        Button(
+                            onClick = {
+                                viewModel.addNewWorkout()
+                                onCreateWorkoutClicked() },
+                            shape = CircleShape,
+                            colors = ButtonDefaults.buttonColors(Color.Transparent),
+                            modifier = Modifier.size(30.dp),
+                            contentPadding = PaddingValues(0.dp),
+                        ) {
+                            Icon(
+                                imageVector = rememberAdd(),
+                                contentDescription = "edit",
+                                modifier = Modifier.size(30.dp),
+                                tint = DarkGreen
+                            )
+                        }
+                    }
+                }
+
+                /* BOTTOM SECTION */
+                items(viewModel.savedWorkouts.value) { workout ->
                     Row( // Workout display (box)
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -167,6 +172,22 @@ fun SavedView(
                             .background(LightGrey)
                             .padding(10.dp)
                     ) {
+                        IconButton(
+                            onClick = {
+                                viewModel.selectedWorkout.value = workout
+                                viewModel.editingWorkout.value = true
+                                onEditWorkoutClicked()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Create,
+                                contentDescription = "edit workout",
+                                modifier = Modifier.size(20.dp),
+                                tint = DarkGreen,)
+                        }
+
+                        Spacer(modifier = Modifier.height(2.dp))
+
                         Column( // Workout title
                             horizontalAlignment = Alignment.Start
                         ) {
@@ -174,16 +195,6 @@ fun SavedView(
                                 text = workout.name,
                                 style = Typography.bodyLarge
                             )
-                            Button(
-                                onClick = onEditWorkoutClicked,
-                                colors = ButtonDefaults.buttonColors(LightGreen)
-                            ) {
-                                Text(
-                                    text = "Edit",
-                                    style = Typography.bodySmall,
-                                    color = DarkGreen
-                                )
-                            }
                         }
 
                         Spacer(modifier = Modifier.weight(1f))

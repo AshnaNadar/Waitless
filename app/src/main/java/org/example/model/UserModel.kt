@@ -33,6 +33,12 @@ class UserModel : IPresenter() {
             notifySubscribers()
         }
 
+    var editingWorkout: Boolean = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
     // Queue API Stuff
     var userQueueCount: Int = 10
 
@@ -135,46 +141,49 @@ class UserModel : IPresenter() {
     // adds name to last created saved workout
     // ends creating workout process
     fun addWorkoutName(workoutName: String) {
-        savedWorkouts[savedWorkouts.lastIndex].name = workoutName
+        savedWorkouts.last().name = workoutName
         creatingWorkout = false
+        selectedWorkout = savedWorkouts.last()
     }
 
     // removes last saved workout
     fun removeWorkout() {
-        creatingWorkout = true
-        savedWorkouts.removeAt(savedWorkouts.lastIndex)
+        creatingWorkout = false
+        savedWorkouts.removeLast()
+    }
+
+    // apply edits to selectedWorkout in savedWorkouts
+    fun editWorkout() {
+        editingWorkout = false
+        savedWorkouts.forEachIndexed { i, workout ->
+            if (workout.name == selectedWorkout.name) {
+                savedWorkouts[i] = selectedWorkout
+            }
+        }
+        selectedWorkout.name = ""
+        selectedWorkout.machines.clear()
     }
 
     // adds machine to workoutName
     // or last Workout in savedWorkouts if not specified
-    fun addMachine(machine: String, workoutName: String? = null) {
-        var index = savedWorkouts.lastIndex
-
-        if (workoutName != null) {
-            savedWorkouts.forEachIndexed { i, workout ->
-                if (workout.name == workoutName) {
-                    index = i
-                }
-            }
+    fun addMachine(machine: String) {
+        if (creatingWorkout) {
+            savedWorkouts.last()
+                .machines.add(machine)
+        } else { // editing workout
+            selectedWorkout.machines.add(machine)
         }
-
-        savedWorkouts[index].machines.add(machine)
     }
 
     // removes machine to workoutName
     // or last Workout in savedWorkouts if not specified
-    fun removeMachine(machine: String, workoutName: String? = null) {
-        var index = savedWorkouts.lastIndex
-
-        if (workoutName != null) {
-            savedWorkouts.forEachIndexed { i, workout ->
-                if (workout.name == workoutName) {
-                    index = i
-                }
-            }
+    fun removeMachine(machine: String) {
+        if (creatingWorkout) {
+            savedWorkouts.last()
+                .machines.remove(machine)
+        } else { // editing workout
+            selectedWorkout.machines.remove(machine)
         }
-
-        savedWorkouts[index].machines.remove(machine)
     }
     
 }

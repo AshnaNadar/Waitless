@@ -51,7 +51,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
         }
         composable(route = MenuBarOptions.Saved.route) {
             SavedView(
-                onEditWorkoutClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) },
+                onEditWorkoutClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
                 onCreateWorkoutClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
                 userViewModel = viewModel,
                 userController = controller

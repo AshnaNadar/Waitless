@@ -1,5 +1,6 @@
 package org.example.userinterface
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import org.example.model.UserModel
@@ -19,9 +20,10 @@ class UserViewModel(val model: UserModel) : ISubscriber {
 
     // Saved Workouts
     var creatingWorkout = mutableStateOf(false)
+    var editingWorkout = mutableStateOf(false)
 
     // Database Stuff
-        var savedWorkouts = mutableStateOf(emptyList<Workout>())
+    var savedWorkouts = mutableStateOf(emptyList<Workout>())
     var allMachineNames = mutableStateOf(emptyList<String>())
 
     init {
@@ -30,6 +32,8 @@ class UserViewModel(val model: UserModel) : ISubscriber {
 //        model.fetchQueueAPIdata()
     }
 
+    // if no workout supplied, sets creating workout state to true
+    // else, adds workout to saved workouts and sets creating workout state to false
     fun addNewWorkout() {
         model.addNewWorkout()
     }
@@ -41,6 +45,11 @@ class UserViewModel(val model: UserModel) : ISubscriber {
     fun removeWorkout() {
         model.removeWorkout()
     }
+
+    fun editWorkout() {
+        model.editWorkout()
+    }
+
     fun addMachine(machine: String) {
         model.addMachine(machine)
     }
@@ -56,6 +65,7 @@ class UserViewModel(val model: UserModel) : ISubscriber {
         selectedWorkout.value = model.selectedWorkout
         userQueueCount.intValue = model.userQueueCount
         creatingWorkout.value = model.creatingWorkout
+        editingWorkout.value = model.editingWorkout
 
         // Database Stuff
         savedWorkouts.value = model.savedWorkouts
