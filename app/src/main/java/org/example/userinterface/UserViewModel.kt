@@ -1,8 +1,10 @@
 package org.example.userinterface
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import org.example.model.UserModel
+import org.example.model.Workout
 
 // Read all values needed in the UI from here
 
@@ -11,13 +13,17 @@ class UserViewModel(val model: UserModel) : ISubscriber {
     var password = mutableStateOf("")
 
     // Home Page
-    var selectedWorkout = mutableStateOf("") // Empty if no workout selected
+    var selectedWorkout = mutableStateOf(Workout("", mutableListOf<String>())) // Empty if no workout selected
 
     // Queue Management Stuff
     var userQueueCount = mutableIntStateOf(12)
 
+    // Saved Workouts
+    var creatingWorkout = mutableStateOf(false)
+    var editingWorkout = mutableStateOf(false)
+
     // Database Stuff
-    var savedWorkouts = mutableStateOf(emptyMap<String, List<String>>())
+    var savedWorkouts = mutableStateOf(emptyList<Workout>())
     var allMachineNames = mutableStateOf(emptyList<String>())
 
     init {
@@ -26,12 +32,40 @@ class UserViewModel(val model: UserModel) : ISubscriber {
 //        model.fetchQueueAPIdata()
     }
 
+    // if no workout supplied, sets creating workout state to true
+    // else, adds workout to saved workouts and sets creating workout state to false
+    fun addNewWorkout() {
+        model.addNewWorkout()
+    }
+
+    fun addWorkoutName(workoutName: String) {
+        model.addWorkoutName(workoutName)
+    }
+
+    fun removeWorkout() {
+        model.removeWorkout()
+    }
+
+    fun editWorkout() {
+        model.editWorkout()
+    }
+
+    fun addMachine(machine: String) {
+        model.addMachine(machine)
+    }
+
+    fun removeMachine(machine: String) {
+        model.removeMachine(machine)
+    }
+
     override fun update() {
         username.value = model.username
         password.value = model.password
 
         selectedWorkout.value = model.selectedWorkout
         userQueueCount.intValue = model.userQueueCount
+        creatingWorkout.value = model.creatingWorkout
+        editingWorkout.value = model.editingWorkout
 
         // Database Stuff
         savedWorkouts.value = model.savedWorkouts

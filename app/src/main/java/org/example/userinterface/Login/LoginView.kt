@@ -185,7 +185,7 @@ fun LoginView(
                         - routes to opening page (NULL currently)
                     */
                     Button( // close button
-                        onClick = {},
+                        onClick = onLoginButtonClicked, //  TEMP: for testing
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(Color.Transparent),
                         modifier = Modifier.size(40.dp),

@@ -1,5 +1,6 @@
 package org.example.userinterface.Home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,15 +12,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -27,10 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.example.controller.UserController
 import org.example.theme.*
@@ -243,6 +242,7 @@ fun rememberStopCircle(): ImageVector {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeView(
     userViewModel: UserViewModel,
@@ -279,7 +279,7 @@ fun HomeView(
                     style = Typography.headlineMedium
                 )
 
-                if (viewModel.selectedWorkout.value == "") { // no workout selected
+                if (viewModel.selectedWorkout.value.name == "") { // no workout selected
 
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -309,7 +309,7 @@ fun HomeView(
                 modifier = Modifier
                     .heightIn(120.dp)
             ) {
-                if (viewModel.selectedWorkout.value == "") { // No workout selected
+                if (viewModel.selectedWorkout.value.name == "") { // No workout selected
                     /* Label visible if no workout selected.*/
                     Text(
                         text = "No active workout - start one now!",
@@ -321,10 +321,12 @@ fun HomeView(
                     /*
                     Add machines button
                         - visible if no workout selected
-                        - creates a temporary workout (not added to saved workouts)
+                        - creates a saved workout
                     */
                     Button(
-                        onClick = onInfoClicked,
+                        onClick = {
+                            viewModel.addNewWorkout()
+                            onInfoClicked() },
                         colors = ButtonDefaults.buttonColors(DarkGreen),
                         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
                         modifier = Modifier
@@ -358,7 +360,7 @@ fun HomeView(
                                 horizontalAlignment = Alignment.Start
                             ) {
                                 Text(
-                                    text = viewModel.selectedWorkout.value,
+                                    text = viewModel.selectedWorkout.value.name,
                                     style = Typography.bodyLarge
                                 )
                             }
@@ -367,7 +369,7 @@ fun HomeView(
                                 horizontalAlignment = Alignment.End
                             ) {
                                 Text(
-                                    text = viewModel.savedWorkouts.value[viewModel.selectedWorkout.value]?.size.toString(),
+                                    text = viewModel.selectedWorkout.value.machines.size.toString(),
                                     style = Typography.bodyLarge
                                 )
                                 Text(
@@ -401,47 +403,48 @@ fun HomeView(
                 }
             }
 
-            Row( // BOTTOM SECTION
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
+            /* BOTTOM SECTION */
+            LazyColumn( // Scrollable column to go through saved workouts
+                userScrollEnabled = true
             ) {
-                /* Your Workouts Heading */
-                Text(
-                    text = "Your Workouts",
-                    style = Typography.headlineSmall
-                )
 
-                /*
-                See All Button
-                    - routes to saved workouts page
-                */
-                TextButton(
-                    onClick = onSeeAllClicked,
-                   // colors = ButtonDefaults.buttonColors(LightGreen)
-                ) {
-                    Text(
-                        text = "See All",
-                        style = Typography.bodySmall,
-                        color = DarkGreen)
+                stickyHeader {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    ) {
+                        /* Your Workouts Heading */
+                        Text(
+                            text = "Your Workouts",
+                            style = Typography.headlineSmall
+                        )
+
+                        /*
+                        See All Button
+                            - routes to saved workouts page
+                        */
+                        TextButton(
+                            onClick = onSeeAllClicked,
+                            // colors = ButtonDefaults.buttonColors(LightGreen)
+                        ) {
+                            Text(
+                                text = "See All",
+                                style = Typography.bodySmall,
+                                color = DarkGreen)
+                        }
+                    }
                 }
-            }
 
-            Column( // Scrollable column to go through saved workouts
-                verticalArrangement = Arrangement.spacedBy(15.dp),
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .weight(1f, false)
-            ) {
-
-                viewModel.savedWorkouts.value.forEach { (workoutName, machines) ->
+                items(viewModel.savedWorkouts.value) { workout ->
                     Row( // Workout display (box)
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .clickable {
-                                viewModel.selectedWorkout.value = workoutName // need to invoke controller?
+                                viewModel.selectedWorkout.value =
+                                    workout // need to invoke controller?
                             }
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
@@ -452,7 +455,7 @@ fun HomeView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = workoutName,
+                                text = workout.name,
                                 style = Typography.bodyLarge
                             )
                         }
@@ -461,7 +464,7 @@ fun HomeView(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = machines.size.toString(),
+                                text = workout.machines.size.toString(),
                                 style = Typography.bodyLarge
                             )
                             Text(
@@ -470,9 +473,13 @@ fun HomeView(
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
                 }
             }
         }
+
 
         // gradient at bottom of screen
         val gradient = Brush.verticalGradient(
