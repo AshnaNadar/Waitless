@@ -29,18 +29,21 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
             LoginView(onLoginButtonClicked = { navController.navigate(MenuBarOptions.Home.route) })
         }
         composable(route = MenuBarOptions.Home.route) {
-            HomeView(
-                onInfoClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
-                onSeeAllClicked = { navController.navigate(MenuBarOptions.Saved.route) },
-                onStartClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) },
-                userViewModel = viewModel,
-                userController = controller
-            )
+            if (viewModel.workoutOngoing.value) {
+                navController.navigate(MenuBarOptions.HomeWorkout.route)
+            } else {
+                HomeView(
+                    onInfoClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
+                    onSeeAllClicked = { navController.navigate(MenuBarOptions.Saved.route) },
+                    onStartClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) },
+                    userViewModel = viewModel,
+                    userController = controller
+                )
+            }
         }
         composable(route = MenuBarOptions.HomeWorkout.route) {
             HomeWorkoutView(
                 onStopWorkoutClicked = { navController.navigate(MenuBarOptions.Home.route) },
-                onLastSetClicked = { },
                 onEquipmentInfoClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) },
                 userViewModel = viewModel,
                 userController = controller

@@ -1,17 +1,32 @@
 package org.example.model
 
-import QueueApiFunctions.addUser
-import QueueApiFunctions.getUserQueues
-import android.util.Log
+import QueueApiFunctions.getQueueCount
+import QueueApiFunctions.joinQueue
 
 // All the values are stored here. UserController invokes this
 
 data class Workout(
     var name: String,
-    val machines: MutableList<String>
-)
+    var machines: MutableList<String>,
+    var inQueue: MutableSet<String>
+) {
+    constructor(name: String, machines: MutableList<String>) : this (
+        name = name,
+        machines = machines,
+        inQueue = mutableSetOf<String>()
+    )
+    fun copy(): Workout { // For deep copy
+        val newMachines = mutableListOf<String>()
+        newMachines.addAll(machines)
+        val newQueue = mutableSetOf<String>()
+        newQueue.addAll(inQueue)
+        return Workout(name, newMachines, newQueue)
+    }
+}
+
 class UserModel : IPresenter() {
 
+    // User Info
     var username: String = ""
         set(value) {
             field = value
@@ -26,13 +41,34 @@ class UserModel : IPresenter() {
 
     var userid: String = "20871851"
 
-    // Saved Workout Stuff
-    var creatingWorkout: Boolean = false
+    // Today's Workout (Home Page)
+    var selectedWorkout: Workout = Workout("", mutableListOf<String>())
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var currentMachine: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var workoutOngoing: Boolean = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var timeStarted: Long = 0 // Start time of ongoing machine
         set(value) {
             field = value
             notifySubscribers()
         }
 
+    // Creating and Editing workouts (Saved Page)
+    var creatingWorkout: Boolean = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
     var editingWorkout: Boolean = false
         set(value) {
             field = value
@@ -41,23 +77,26 @@ class UserModel : IPresenter() {
 
     // Queue API Stuff
     var userQueueCount: Int = 10
-
-    // Database Stuff
-    var savedWorkouts: MutableList<Workout> = emptyList<Workout>().toMutableList()
-    var allMachineNames: List<String> = emptyList()
-
-    // Home Screen
-    var selectedWorkout: Workout = Workout("", mutableListOf<String>())
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var machineWaitTimes: MutableMap<String, Int> = mutableMapOf()
         set(value) {
             field = value
             notifySubscribers()
         }
 
+    // Database Stuff
+    var savedWorkouts: MutableList<Workout> = emptyList<Workout>().toMutableList()
+    var allMachines: List<String> = emptyList()
 
     fun fetchQueueAPIdata() {
-        addUser(userid) { _ ->
-            getUserQueues(userid) { response ->
-                userQueueCount = response.body()?.count ?: 0
+        // Get Machine Wait Times
+        allMachines.forEach { machine ->
+            machineWaitTimes[machine] = 0
+            getQueueCount(machine) { response ->
+                machineWaitTimes[machine] = response.body()?.count ?: -1
                 notifySubscribers()
             }
         }
@@ -67,7 +106,7 @@ class UserModel : IPresenter() {
         // add calls to Supabase here to get workouts, machine info, etc
 
         // temporarily hardcoding values for testing:
-        allMachineNames = listOf(
+        allMachines = listOf(
             "Treadmill",
             "Stationarybike",
             "Ellipticaltrainer",
@@ -84,8 +123,8 @@ class UserModel : IPresenter() {
             "Dumbbellrack",
             "Adjustablebench",
             "Abdominalcrunchmachine",
-            "Hipabduction/adductionmachine",
-            "Assistedpull-up/dipmachine",
+            "Hipabduction",
+            "Assistedpull-up",
             "Smithmachine",
             "Hacksquatmachine"
         )
@@ -93,8 +132,8 @@ class UserModel : IPresenter() {
         savedWorkouts = mutableListOf(
             Workout("Cardio Blast",
                 mutableListOf(
-                    "Treadmill",
                     "Stationarybike",
+                    "Treadmill",
                     "Ellipticaltrainer")
             ),
             Workout("Upper Body Sculpt",
@@ -119,11 +158,11 @@ class UserModel : IPresenter() {
                     "Cablecrossovermachine",
                     "Adjustablebench",
                     "Abdominalcrunchmachine",
-                    "Hipabduction/adductionmachine")
+                    "Hipabduction")
             ),
             Workout("Strength and Stability",
                 mutableListOf(
-                    "Assistedpull-up/dipmachine",
+                    "Assistedpull-up",
                     "Smith machine")
             )
 
@@ -185,5 +224,8 @@ class UserModel : IPresenter() {
             selectedWorkout.machines.remove(machine)
         }
     }
+
+    // Queue Management Functions
+
     
 }

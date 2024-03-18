@@ -2,7 +2,6 @@ package org.example.userinterface.Home
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,10 +21,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,44 +36,34 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import org.example.controller.UserController
 import org.example.theme.Background
 import org.example.theme.DarkGreen
-import org.example.theme.GreyText
-import org.example.theme.LightGreen
 import org.example.theme.LightGrey
-import org.example.theme.Pink40
-import org.example.theme.Pink80
-import org.example.theme.Purple40
-import org.example.theme.PurpleGrey40
-import org.example.theme.PurpleGrey80
 import org.example.theme.Typography
-import org.example.userinterface.Equipment.EquipmentView
 import org.example.userinterface.UserViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeWorkoutView(
     userViewModel: UserViewModel,
     userController: UserController,
     onStopWorkoutClicked: () -> Unit = {},
-    onLastSetClicked: () -> Unit = {},
     onEquipmentInfoClicked: () -> Unit = {}
 ) {
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
 
-    var currentWorkoutList by remember { mutableStateOf(listOf<String>()) }
-    var upcomingMachines by remember { mutableStateOf(listOf<String>()) }
-    var currentMachine by remember { mutableStateOf("") }
-
-    currentWorkoutList = viewModel.selectedWorkout.value.machines ?: emptyList()
-    upcomingMachines = currentWorkoutList.toMutableList()
-    if (upcomingMachines.isNotEmpty()) {
-        currentMachine = upcomingMachines.first()
-        upcomingMachines = upcomingMachines.drop(1)
+    // Set up timer
+    var timeElapsed by remember { mutableIntStateOf(0) } // in seconds
+    LaunchedEffect(true) {
+        while (true) {
+            val timeElapsedSeconds = (System.currentTimeMillis() - viewModel.timeStarted.longValue) / 1000
+            timeElapsed = timeElapsedSeconds.toInt()
+            delay(1000)
+        }
     }
 
     Box(
@@ -85,7 +72,6 @@ fun HomeWorkoutView(
             .background(Background)
             .padding(top = 80.dp, start = 20.dp, end = 20.dp)
     ) {
-
         /* Contains all items for this screen. */
         Column(
             horizontalAlignment = Alignment.Start
@@ -95,7 +81,7 @@ fun HomeWorkoutView(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
+                    .padding(3.dp)
             ) {
                 /* Page Title */
                 Text(
@@ -106,24 +92,24 @@ fun HomeWorkoutView(
                 Spacer(modifier = Modifier.weight(1f))
 
                 /*
-                Stop Button
+                End Workout Button
                     - routes back to home page
                 */
-                Button(
-                    onClick = onStopWorkoutClicked,
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(Color.Transparent),
-                    modifier = Modifier.size(30.dp),
-                    contentPadding = PaddingValues(0.dp),
+                TextButton(
+                    onClick = {
+                        onStopWorkoutClicked()
+                        controller.refetchQueueAPIdata()
+                        controller.endWorkout()
+                    },
                 ) {
-                    Icon(
-                        imageVector = rememberStopCircle(),
-                        contentDescription = "stop",
-                        modifier = Modifier.size(20.dp),
-                        tint = DarkGreen
+                    Text(
+                        text = "End Workout",
+                        style = Typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline,
+                        color = DarkGreen,
                     )
                 }
-
             }
 
             Column( // TOP SECTION
@@ -151,7 +137,7 @@ fun HomeWorkoutView(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = currentMachine,
+                                text = viewModel.currentMachine.value,
                                 style = Typography.bodyLarge
                             )
 
@@ -179,8 +165,8 @@ fun HomeWorkoutView(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = "X:XX",
-                                style = Typography.bodyLarge
+                                text = timeElapsed.toString(),
+                                style = Typography.bodyLarge,
                             )
                             Text(
                                 text = "mins elapsed",
@@ -190,23 +176,47 @@ fun HomeWorkoutView(
                     }
                 }
 
-                /*
-                Last Set button
-                    - does nothing rn
-                */
-                Button(
-                    onClick = onLastSetClicked,
-                    colors = ButtonDefaults.buttonColors(DarkGreen),
-                    shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(70.dp)
-                        .padding(0.dp, 10.dp)
-                ) {
-                    Text(
-                        text = "Last Set",
-                        style = Typography.bodyMedium
-                    )
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                    /*
+                    Last Set button
+                    */
+                    Button(
+                        onClick = { controller.lastSet() },
+                        colors = ButtonDefaults.buttonColors(DarkGreen),
+                        shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(70.dp)
+                            .padding(0.dp, 10.dp)
+                            .padding(end = 4.dp)
+                    ) {
+                        Text(
+                            text = "Last Set",
+                            style = Typography.bodyMedium
+                        )
+                    }
+
+                    /*
+                   Next Machine button
+                   */
+                    Button(
+                        onClick = {
+                            controller.moveToNextMachine()
+                        },
+                        colors = ButtonDefaults.buttonColors(DarkGreen),
+                        shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(70.dp)
+                            .padding(0.dp, 10.dp)
+                            .padding(start = 4.dp)
+                    ) {
+                        Text(
+                            text = "Next Machine",
+                            style = Typography.bodyMedium
+                        )
+                    }
+
                 }
             }
 
@@ -214,7 +224,7 @@ fun HomeWorkoutView(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(5.dp)
+                    .padding(3.dp)
             ) {
                 /* Upcoming Machines Heading */
                 Text(
@@ -231,8 +241,13 @@ fun HomeWorkoutView(
                 ) {
                     Text(
                         text = "See All",
-                        style = Typography.bodySmall,
-                        color = DarkGreen)
+                        style = Typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline,
+                        color = DarkGreen ,
+                        modifier = Modifier
+                            .padding(bottom = 15.dp)
+                    )
                 }
             }
 
@@ -243,55 +258,66 @@ fun HomeWorkoutView(
                     .weight(1f, false)
             ) {
 
-                upcomingMachines.forEach { machine ->
-                    Row ( // Workout display (box)
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
-                            .background(LightGrey)
-                            .padding(10.dp)
-                    ) {
-                        Column( // Workout title
-                            horizontalAlignment = Alignment.Start
+                viewModel.selectedWorkout.value.machines.forEachIndexed { index, machine ->
+                    if (index != 0) {
+                        Row( // Workout display (box)
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                                .background(LightGrey)
+                                .padding(10.dp)
                         ) {
-                            Text(
-                                text = machine,
-                                style = Typography.bodyLarge
-                            )
-
-                            /*
-                            Info Button
-                                - routes to equipment info page
-                            */
-                            Button(
-                                onClick = onEquipmentInfoClicked,
-                                shape = CircleShape,
-                                colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                modifier = Modifier.size(30.dp),
-                                contentPadding = PaddingValues(0.dp),
+                            Column( // Workout title
+                                horizontalAlignment = Alignment.Start
                             ) {
-                                Icon(
-                                    imageVector = rememberInfo(),
-                                    contentDescription = "info",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = DarkGreen
+                                Text(
+                                    text = machine,
+                                    style = Typography.bodyLarge
+                                )
+
+                                Row {
+                                    /*
+                                Info Button
+                                    - routes to equipment info page
+                                */
+                                    Button(
+                                        onClick = onEquipmentInfoClicked,
+                                        shape = CircleShape,
+                                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                        modifier = Modifier.size(30.dp),
+                                        contentPadding = PaddingValues(0.dp),
+                                    ) {
+                                        Icon(
+                                            imageVector = rememberInfo(),
+                                            contentDescription = "edit",
+                                            modifier = Modifier.size(20.dp),
+                                            tint = DarkGreen
+                                        )
+                                    }
+                                    println(viewModel.selectedWorkout.value.inQueue)
+                                    if (machine in viewModel.selectedWorkout.value.inQueue) {
+                                        Text(
+                                            text = "Waiting in Queue",
+                                            style = Typography.bodyMedium
+                                        )
+                                    }
+                                }
+                            }
+
+                            Column( // People in queue
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(
+                                    text = viewModel.machineWaitTimes.value[machine].toString(),
+                                    style = Typography.bodyLarge
+                                )
+                                Text(
+                                    text = "in queue",
+                                    style = Typography.bodyLarge
                                 )
                             }
-                        }
-
-                        Column( // People in queue
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(
-                                text = "X",
-                                style = Typography.bodyLarge
-                            )
-                            Text(
-                                text = "people waiting",
-                                style = Typography.bodyLarge
-                            )
                         }
                     }
                 }
@@ -314,3 +340,19 @@ fun HomeWorkoutView(
         )
     }
 }
+
+// Old stop workout button:
+//                Button(
+//                    onClick = onStopWorkoutClicked,
+//                    shape = CircleShape,
+//                    colors = ButtonDefaults.buttonColors(DarkGreen),
+//                    modifier = Modifier.size(30.dp),
+//                    contentPadding = PaddingValues(0.dp),
+//                ) {
+//                    Icon(
+//                        imageVector = rememberStopCircle(),
+//                        contentDescription = "stop",
+//                        modifier = Modifier.size(20.dp),
+//                        tint = DarkGreen
+//                    )
+//                }

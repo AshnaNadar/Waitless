@@ -255,44 +255,7 @@ fun LoginView(
 
                 Row (horizontalArrangement = Arrangement.Center) {
                     Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                val httpClient = HttpClient()
-                                try {
-                                    Log.d("TRY Block:", "${email}, ${password}")
-                                    val response: HttpResponse =
-                                        httpClient.post("http://10.0.2.2:8080/auth/signin") {
-                                            contentType(ContentType.Application.Json)
-                                            body =
-                                                Json.encodeToString(LoginRequest(email, password))
-                                        }
-                                    when (response.status.value) {
-                                        in 200..299 -> {
-                                            // Successful login
-                                            val responseBody: String = response.body()
-                                            Log.d("ResponseLogin:", responseBody)
-                                            onLoginButtonClicked()
-                                        }
-
-                                        else -> {
-                                            // Other error occurred
-                                            Log.d(
-                                                "ResponseLogin:",
-                                                "Unexpected response code: ${response.status.value}"
-                                            )
-                                            showErrorMessage = true
-                                            errorText = "Invalid Username/Password"
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    println("Error: ${e.message}")
-                                    showErrorMessage = true
-                                    errorText = "Unable to connect to DB"
-                                } finally {
-                                    httpClient.close()
-                                }
-                            }
-                        },
+                        onClick = { onLoginButtonClicked() }, // For Testing Purposes
                         colors = ButtonDefaults.buttonColors(DarkGreen),
                         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
                         modifier = Modifier
@@ -311,4 +274,42 @@ fun LoginView(
     }
 }
 
+//onClick = {
+//                            coroutineScope.launch {
+//                                val httpClient = HttpClient()
+//                                try {
+//                                    Log.d("TRY Block:", "${email}, ${password}")
+//                                    val response: HttpResponse =
+//                                        httpClient.post("http://10.0.2.2:8080/auth/signin") {
+//                                            contentType(ContentType.Application.Json)
+//                                            body =
+//                                                Json.encodeToString(LoginRequest(email, password))
+//                                        }
+//                                    when (response.status.value) {
+//                                        in 200..299 -> {
+//                                            // Successful login
+//                                            val responseBody: String = response.body()
+//                                            Log.d("ResponseLogin:", responseBody)
+//                                            onLoginButtonClicked()
+//                                        }
+//
+//                                        else -> {
+//                                            // Other error occurred
+//                                            Log.d(
+//                                                "ResponseLogin:",
+//                                                "Unexpected response code: ${response.status.value}"
+//                                            )
+//                                            showErrorMessage = true
+//                                            errorText = "Invalid Username/Password"
+//                                        }
+//                                    }
+//                                } catch (e: Exception) {
+//                                    println("Error: ${e.message}")
+//                                    showErrorMessage = true
+//                                    errorText = "Unable to connect to DB"
+//                                } finally {
+//                                    httpClient.close()
+//                                }
+//                            }
+//                        },
 

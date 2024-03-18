@@ -364,7 +364,7 @@ fun EquipmentView(
                                 horizontalAlignment = Alignment.End,
                             ) {
                                 Text(
-                                    text = "X",
+                                    text = viewModel.machineWaitTimes.value[machineName].toString(),
                                     style = Typography.bodyLarge
                                 )
                                 Text(
