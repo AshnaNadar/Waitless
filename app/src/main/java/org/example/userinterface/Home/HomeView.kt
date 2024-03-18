@@ -386,7 +386,8 @@ fun HomeView(
                             - starts the selected workout
                         */
                         Button(
-                            onClick = onStartClicked,
+                            onClick = {onStartClicked()
+                                controller.startWorkout()},
                             shape = CircleShape,
                             colors = ButtonDefaults.buttonColors(DarkGreen),
                             modifier = Modifier
@@ -442,10 +443,7 @@ fun HomeView(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .clickable {
-                                viewModel.selectedWorkout.value =
-                                    workout // need to invoke controller?
-                            }
+                            .clickable { controller.selectWorkout(workout) }
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
                             .background(LightGrey)
