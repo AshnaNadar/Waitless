@@ -214,8 +214,8 @@ fun EquipmentView(
                     Button(
                         onClick = {
                             if (viewModel.creatingWorkout.value) {
-                                if (viewModel.savedWorkouts.value.last().machines.isEmpty()) {
-                                    viewModel.removeWorkout() // no machines selected (don't create an empty workout)
+                                if (viewModel.noMachinesAdded()) {
+                                    viewModel.removeWorkout()
                                     onDoneSelectingClicked()
                                 } else {
                                     showDialog.value = true
@@ -227,8 +227,7 @@ fun EquipmentView(
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(Color.Transparent),
                         modifier = Modifier.size(30.dp),
-                        contentPadding = PaddingValues(0.dp),
-                        //enabled =
+                        contentPadding = PaddingValues(0.dp)
                     ) {
                         Icon(
                             imageVector = rememberDone(),
@@ -245,7 +244,7 @@ fun EquipmentView(
                                 onDoneSelectingClicked()
                                 showDialog.value = false },
                             onConfirmation = {
-                                viewModel.addWorkoutName(it)
+                                viewModel.addWorkout(it)
                                 onDoneSelectingClicked()
                                 showDialog.value = false },
                             workoutName = "",
@@ -274,11 +273,8 @@ fun EquipmentView(
                             Add button
                                 - adds machine to last Workout in savedWorkouts
                             */
-                            var machineAdded by remember { mutableStateOf(false) }
-
-                            if (viewModel.editingWorkout.value) {
-                                machineAdded = remember { viewModel.selectedWorkout.value.machines.contains(machineName) }
-                            }
+                            var machineAdded by remember { mutableStateOf(
+                                viewModel.selectedWorkout.value.machines.contains(machineName)) }
                             
                             IconButton(
                                 onClick = {

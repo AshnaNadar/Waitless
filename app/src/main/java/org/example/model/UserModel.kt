@@ -2,6 +2,7 @@ package org.example.model
 
 import QueueApiFunctions.getQueueCount
 import QueueApiFunctions.joinQueue
+import android.util.Log
 
 // All the values are stored here. UserController invokes this
 
@@ -171,58 +172,57 @@ class UserModel : IPresenter() {
         notifySubscribers()
     }
 
-    // creates empty Workout and adds it to savedWorkouts
-    fun addNewWorkout() {
-        creatingWorkout = true
-        savedWorkouts.add(Workout("", mutableListOf<String>()))
+    // creates new Workout and adds it to savedWorkouts
+    fun addWorkout(workoutName: String? = null) {
+        if (workoutName == null) { // start creating new workout in selectedWorkout
+            removeWorkout() // remove selected workout
+            creatingWorkout = true
+        } else { // add selectedWorkout to savedWorkouts
+            selectedWorkout.name = workoutName
+            savedWorkouts.add(selectedWorkout.copy())
+            currentMachine = selectedWorkout.machines.first() // newly added workout remains selected
+            creatingWorkout = false
+        }
     }
 
-    // adds name to last created saved workout
-    // ends creating workout process
-    fun addWorkoutName(workoutName: String) {
-        savedWorkouts.last().name = workoutName
-        creatingWorkout = false
-        selectedWorkout = savedWorkouts.last()
+    fun noMachinesAdded() : Boolean {
+        return selectedWorkout.machines.isEmpty()
     }
 
-    // removes last saved workout
+    // clears selectedWorkout
     fun removeWorkout() {
         creatingWorkout = false
-        savedWorkouts.removeLast()
-    }
 
-    // apply edits to selectedWorkout in savedWorkouts
-    fun editWorkout() {
-        editingWorkout = false
-        savedWorkouts.forEachIndexed { i, workout ->
-            if (workout.name == selectedWorkout.name) {
-                savedWorkouts[i] = selectedWorkout
-            }
-        }
+        // clear selected workout
         selectedWorkout.name = ""
         selectedWorkout.machines.clear()
+        selectedWorkout.inQueue.clear()
+        currentMachine = ""
     }
 
-    // adds machine to workoutName
-    // or last Workout in savedWorkouts if not specified
+    fun editWorkout(workout: Workout? = null) {
+        if (workout != null) { // select workout to edit
+            editingWorkout = true
+            selectedWorkout = workout.copy()
+        } else { // apply edits made to selectedWorkout in savedWorkouts
+            editingWorkout = false
+            savedWorkouts.forEachIndexed { i, savedWorkout ->
+                if (savedWorkout.name == selectedWorkout.name) {
+                    savedWorkouts[i] = selectedWorkout.copy()
+                }
+            }
+            removeWorkout() // remove selected workout
+        }
+    }
+
+    // adds machine to the selected workout
     fun addMachine(machine: String) {
-        if (creatingWorkout) {
-            savedWorkouts.last()
-                .machines.add(machine)
-        } else { // editing workout
-            selectedWorkout.machines.add(machine)
-        }
+        selectedWorkout.machines.add(machine)
     }
 
-    // removes machine to workoutName
-    // or last Workout in savedWorkouts if not specified
+    // removes machine from the selected workout
     fun removeMachine(machine: String) {
-        if (creatingWorkout) {
-            savedWorkouts.last()
-                .machines.remove(machine)
-        } else { // editing workout
-            selectedWorkout.machines.remove(machine)
-        }
+        selectedWorkout.machines.remove(machine)
     }
 
     // Queue Management Functions

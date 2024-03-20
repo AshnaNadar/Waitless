@@ -325,7 +325,7 @@ fun HomeView(
                     */
                     Button(
                         onClick = {
-                            viewModel.addNewWorkout()
+                            viewModel.addWorkout()
                             onInfoClicked() },
                         colors = ButtonDefaults.buttonColors(DarkGreen),
                         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
