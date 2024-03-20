@@ -15,7 +15,7 @@ import org.example.model.Workout
 // Read all values needed in the UI from here
 
 class UserViewModel(val model: UserModel) : ISubscriber {
-    // User Infi
+    // User Info
     var userid: String = ""
 
     // Today's Workout (Home Page)
@@ -47,20 +47,20 @@ class UserViewModel(val model: UserModel) : ISubscriber {
 
     // if no workout supplied, sets creating workout state to true
     // else, adds workout to saved workouts and sets creating workout state to false
-    fun addNewWorkout() {
-        model.addNewWorkout()
-    }
-
-    fun addWorkoutName(workoutName: String) {
-        model.addWorkoutName(workoutName)
+    fun addWorkout(workoutName: String? = null) {
+        model.addWorkout(workoutName)
     }
 
     fun removeWorkout() {
         model.removeWorkout()
     }
 
-    fun editWorkout() {
-        model.editWorkout()
+    fun editWorkout(workout: Workout? = null) {
+        model.editWorkout(workout)
+    }
+
+    fun noMachinesAdded() : Boolean {
+        return model.noMachinesAdded()
     }
 
     fun addMachine(machine: String) {
