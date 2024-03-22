@@ -145,7 +145,7 @@ fun SavedView(
                         */
                         Button(
                             onClick = {
-                                viewModel.addNewWorkout()
+                                viewModel.addWorkout()
                                 onCreateWorkoutClicked() },
                             shape = CircleShape,
                             colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -174,17 +174,17 @@ fun SavedView(
                     ) {
                         IconButton(
                             onClick = {
-                                viewModel.selectedWorkout.value = workout
-                                viewModel.editingWorkout.value = true
+                                viewModel.editWorkout(workout)
                                 onEditWorkoutClicked()
                             },
-                            enabled = false
+                            enabled = !viewModel.workoutOngoing.value // don't allow edits if workout ongoing
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Create,
                                 contentDescription = "edit workout",
                                 modifier = Modifier.size(20.dp),
-                                tint = DarkGreen,)
+                                tint = if (!viewModel.workoutOngoing.value) DarkGreen else LightGreen
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(2.dp))
