@@ -1,20 +1,17 @@
 package org.example.userinterface
 
 import QueueApiFunctions.addUser
-import QueueApiFunctions.joinQueue
-import android.annotation.SuppressLint
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import kotlinx.coroutines.delay
+import androidx.lifecycle.ViewModel
 import org.example.model.UserModel
 import org.example.model.Workout
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 // Read all values needed in the UI from here
-
-class UserViewModel(val model: UserModel) : ISubscriber {
+class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     // User Info
     var userid: String = ""
 
@@ -37,8 +34,11 @@ class UserViewModel(val model: UserModel) : ISubscriber {
     var allMachineNames = mutableStateOf(emptyList<String>())
 
     init {
+        viewModelScope.launch {
+            model.fetchDatabaseStuff()
+        }
         model.subscribe(this)
-        model.fetchDatabaseStuff()
+//        model.fetchDatabaseStuff()
         addUser(model.userid) {}
         model.fetchQueueAPIdata()
     }

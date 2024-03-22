@@ -1,10 +1,27 @@
 package org.example.model
 
 import QueueApiFunctions.getQueueCount
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import QueueApiFunctions.joinQueue
 import android.util.Log
 
 // All the values are stored here. UserController invokes this
+@Serializable
+data class Exercise(
+    val name: String,
+    val description: String,
+    val totalNumberOfMachines: Int,
+    val numberOfAvailableMachines: Int,
+    val gymId: Int,
+    val queueSize: Int)
 
 data class Workout(
     var name: String,
@@ -103,73 +120,113 @@ class UserModel : IPresenter() {
         }
     }
 
-    fun fetchDatabaseStuff() {
+    suspend fun fetchHerokuData(client: HttpClient) {
+        try {
+            val gym_id = 1
+            val responseText = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/gyms/${gym_id}/exercises").toString()
+            val exercises = Json.decodeFromString<List<Exercise>>(responseText)
+            allMachines = exercises.map { it.name }
+            notifySubscribers()
+        } catch (e: Exception) {
+            println("Failed to retrieve data from Heroku: ${e.message}")
+        }
+    }
+
+    suspend fun fetchDatabaseStuff() {
         // add calls to Supabase here to get workouts, machine info, etc
+        try {
+//            allMachines = listOf(
+//                "Treadmill",
+//                "Stationarybike",
+//                "Ellipticaltrainer",
+//                "Rowingmachine",
+//                "Smith machine",
+//                "Legpressmachine",
+//                "Chestpress",
+//                "Latpulldownmachine",
+//                "Legextensionmachine",
+//                "Legcurlmachine",
+//                "Seatedcalfraisemachine",
+//                "Cablecrossovermachine",
+//                "Shoulderpressmachine",
+//                "Dumbbellrack",
+//                "Adjustablebench",
+//                "Abdominalcrunchmachine",
+//                "Hipabduction",
+//                "Assistedpull-up",
+//                "Smithmachine",
+//                "Hacksquatmachine"
+//            )
+            // Get full list of Exercises
+            val client = HttpClient()
+            val gymId = 1
+            val responseExercises: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/gyms/${gymId}/exercises")
+            val exercises: String = responseExercises.body()
+            val jsonArray = Json.parseToJsonElement(exercises).jsonArray
+            allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
 
+            // Get Saved workouts
+            val userId = 5
+            val responseSavedWorkotus: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/user/${userId}")
+            val savedWorkoutsUser: String = responseSavedWorkotus.body()
+            val jsonArrayTmp = Json.parseToJsonElement(savedWorkoutsUser).jsonArray
+            val workouts = jsonArrayTmp.map { workoutElement ->
+                val workoutName = workoutElement.jsonObject["name"]?.jsonPrimitive?.content ?: ""
+                val exercisesJsonArray = workoutElement.jsonObject["exercises"]?.jsonArray
+
+                val exerciseNames = exercisesJsonArray?.mapNotNull { exercise ->
+                    exercise.jsonObject["name"]?.jsonPrimitive?.content
+                } ?: emptyList()
+
+                Workout(workoutName, exerciseNames.toMutableList())
+            }
+            savedWorkouts = workouts.toMutableList()
+            notifySubscribers()
+        } catch (e: Exception) {
+            println("Failed to retrieve data from Heroku: ${e.message}")
+        }
         // temporarily hardcoding values for testing:
-        allMachines = listOf(
-            "Treadmill",
-            "Stationarybike",
-            "Ellipticaltrainer",
-            "Rowingmachine",
-            "Smith machine",
-            "Legpressmachine",
-            "Chestpress",
-            "Latpulldownmachine",
-            "Legextensionmachine",
-            "Legcurlmachine",
-            "Seatedcalfraisemachine",
-            "Cablecrossovermachine",
-            "Shoulderpressmachine",
-            "Dumbbellrack",
-            "Adjustablebench",
-            "Abdominalcrunchmachine",
-            "Hipabduction",
-            "Assistedpull-up",
-            "Smithmachine",
-            "Hacksquatmachine"
-        )
 
-        savedWorkouts = mutableListOf(
-            Workout("Cardio Blast",
-                mutableListOf(
-                    "Stationarybike",
-                    "Treadmill",
-                    "Ellipticaltrainer")
-            ),
-            Workout("Upper Body Sculpt",
-                mutableListOf(
-                    "Smith machine",
-                    "Chestpress",
-                    "Latpulldownmachine",
-                    "Shoulderpressmachine",
-                    "Dumbbellrack"
-                )),
-            Workout("Leg Day",
-                mutableListOf(
-                    "Legpressmachine",
-                    "Legextensionmachine",
-                    "Legcurlmachine",
-                    "Seatedcalfraisemachine",
-                    "Hacksquatmachine")
-            ),
-            Workout("Full Body Burn",
-                mutableListOf(
-                    "Rowingmachine",
-                    "Cablecrossovermachine",
-                    "Adjustablebench",
-                    "Abdominalcrunchmachine",
-                    "Hipabduction")
-            ),
-            Workout("Strength and Stability",
-                mutableListOf(
-                    "Assistedpull-up",
-                    "Smith machine")
-            )
+//        savedWorkouts = mutableListOf(
+//            Workout("Cardio Blast",
+//                mutableListOf(
+//                    "Stationarybike",
+//                    "Treadmill",
+//                    "Ellipticaltrainer")
+//            ),
+//            Workout("Upper Body Sculpt",
+//                mutableListOf(
+//                    "Smith machine",
+//                    "Chestpress",
+//                    "Latpulldownmachine",
+//                    "Shoulderpressmachine",
+//                    "Dumbbellrack"
+//                )),
+//            Workout("Leg Day",
+//                mutableListOf(
+//                    "Legpressmachine",
+//                    "Legextensionmachine",
+//                    "Legcurlmachine",
+//                    "Seatedcalfraisemachine",
+//                    "Hacksquatmachine")
+//            ),
+//            Workout("Full Body Burn",
+//                mutableListOf(
+//                    "Rowingmachine",
+//                    "Cablecrossovermachine",
+//                    "Adjustablebench",
+//                    "Abdominalcrunchmachine",
+//                    "Hipabduction")
+//            ),
+//            Workout("Strength and Stability",
+//                mutableListOf(
+//                    "Assistedpull-up",
+//                    "Smith machine")
+//            )
+//
+//        )
 
-        )
-
-        notifySubscribers()
+//        notifySubscribers()
     }
 
     // creates new Workout and adds it to savedWorkouts
