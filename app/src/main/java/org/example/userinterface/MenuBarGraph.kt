@@ -29,6 +29,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
             LoginView(onLoginButtonClicked = { navController.navigate(MenuBarOptions.Home.route) })
         }
         composable(route = MenuBarOptions.Home.route) {
+            controller.refetchQueueAPIdata()
             if (viewModel.workoutOngoing.value) {
                 navController.navigate(MenuBarOptions.HomeWorkout.route)
             } else {
@@ -42,6 +43,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
             }
         }
         composable(route = MenuBarOptions.HomeWorkout.route) {
+            controller.refetchQueueAPIdata()
             HomeWorkoutView(
                 onStopWorkoutClicked = { navController.navigate(MenuBarOptions.Home.route) },
                 onEquipmentInfoClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) },
@@ -53,6 +55,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
             SettingsView()
         }
         composable(route = MenuBarOptions.Saved.route) {
+            controller.refetchQueueAPIdata()
             SavedView(
                 onEditWorkoutClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
                 onCreateWorkoutClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
@@ -61,6 +64,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
             )
         }
         composable(route = MenuBarOptions.Equipment.route) {
+            controller.refetchQueueAPIdata()
             EquipmentView(
                 onEquipmentClicked = { navController.navigate(MenuBarOptions.EquipmentInfo.route) },
                 onDoneSelectingClicked = { navController.popBackStack() },
