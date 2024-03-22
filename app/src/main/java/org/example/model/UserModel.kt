@@ -70,12 +70,17 @@ class UserModel : IPresenter() {
             field = value
             notifySubscribers()
         }
-    var workoutOngoing: Boolean = false
+    var workoutOngoing: Boolean = false // Currently in a workout or not
         set(value) {
             field = value
             notifySubscribers()
         }
-    var timeStarted: Long = 0 // Start time of ongoing machine
+    var timeStarted: Long = 0 // Start time of current ongoing machine
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var waiting: Boolean = true // Waiting for next machine during a workout
         set(value) {
             field = value
             notifySubscribers()
@@ -112,7 +117,6 @@ class UserModel : IPresenter() {
     fun fetchQueueAPIdata() {
         // Get Machine Wait Times
         allMachines.forEach { machine ->
-            machineWaitTimes[machine] = 0
             getQueueCount(machine) { response ->
                 machineWaitTimes[machine] = response.body()?.count ?: -1
                 notifySubscribers()

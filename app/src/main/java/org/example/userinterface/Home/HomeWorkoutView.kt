@@ -14,10 +14,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -112,111 +116,180 @@ fun HomeWorkoutView(
                 }
             }
 
-            Column( // TOP SECTION
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .heightIn(120.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+            // TOP SECTION
+            if (!viewModel.waiting.value) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .fillMaxWidth()
-                ) { // Selected workout + play button
-                    Row( // Machine display (box)
+                        .heightIn(120.dp)
+                ) {
+                    Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
-                            .background(LightGrey)
-                            .weight(1f)
-                            .heightIn(80.dp)
-                            .padding(10.dp)
-                    ) {
-                        Column( // Machine title
-                            horizontalAlignment = Alignment.Start
+                            .fillMaxWidth()
+                    ) { // Selected workout + play button
+                        Row( // Machine display (box)
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                                .background(LightGrey)
+                                .weight(1f)
+                                .heightIn(80.dp)
+                                .padding(10.dp)
                         ) {
-                            Text(
-                                text = viewModel.currentMachine.value,
-                                style = Typography.bodyLarge
-                            )
-
-                            /*
-                            Info Button
-                                - routes to equipment info page
-                            */
-                            Button(
-                                onClick = onEquipmentInfoClicked,
-                                shape = CircleShape,
-                                colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                modifier = Modifier.size(30.dp),
-                                contentPadding = PaddingValues(0.dp),
+                            Column( // Machine title
+                                horizontalAlignment = Alignment.Start
                             ) {
-                                Icon(
-                                    imageVector = rememberInfo(),
-                                    contentDescription = "edit",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = DarkGreen
+                                Text(
+                                    text = viewModel.currentMachine.value,
+                                    style = Typography.bodyLarge
+                                )
+
+                                /*
+                                Info Button
+                                    - routes to equipment info page
+                                */
+                                Button(
+                                    onClick = onEquipmentInfoClicked,
+                                    shape = CircleShape,
+                                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                    modifier = Modifier.size(30.dp),
+                                    contentPadding = PaddingValues(0.dp),
+                                ) {
+                                    Icon(
+                                        imageVector = rememberInfo(),
+                                        contentDescription = "edit",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = DarkGreen
+                                    )
+                                }
+                            }
+
+                            Column( // Time Elapsed
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(
+                                    text = "${timeElapsed / 60}:${String.format("%02d", timeElapsed % 60)}",
+                                    style = Typography.bodyLarge,
+                                )
+                                Text(
+                                    text = "mins elapsed",
+                                    style = Typography.bodyLarge
                                 )
                             }
                         }
+                    }
 
-                        Column( // Time Elapsed
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(
-                                text = timeElapsed.toString(),
-                                style = Typography.bodyLarge,
-                            )
-                            Text(
-                                text = "mins elapsed",
-                                style = Typography.bodyLarge
-                            )
+                    if (viewModel.selectedWorkout.value.machines.size > 1) {
+                        Row (verticalAlignment = Alignment.CenterVertically) {
+                            /*
+                            Last Set button
+                            */
+                            Button(
+                                onClick = { controller.lastSet() },
+                                colors = ButtonDefaults.buttonColors(DarkGreen),
+                                shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .heightIn(70.dp)
+                                    .padding(0.dp, 10.dp)
+                                    .padding(end = 4.dp)
+                            ) {
+                                Text(
+                                    text = "Last Set",
+                                    style = Typography.bodyMedium
+                                )
+                            }
+
+                            /*
+                           Next Machine button
+                           */
+                            Button(
+                                onClick = {
+                                    controller.moveToNextMachine()
+                                },
+                                colors = ButtonDefaults.buttonColors(DarkGreen),
+                                shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .heightIn(70.dp)
+                                    .padding(0.dp, 10.dp)
+                                    .padding(start = 4.dp)
+                            ) {
+                                Text(
+                                    text = "Next Machine",
+                                    style = Typography.bodyMedium
+                                )
+                            }
+
                         }
                     }
                 }
-
-                Row (verticalAlignment = Alignment.CenterVertically) {
-                    /*
-                    Last Set button
-                    */
-                    Button(
-                        onClick = { controller.lastSet() },
-                        colors = ButtonDefaults.buttonColors(DarkGreen),
-                        shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+            } else { // If waiting for next machine
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .heightIn(120.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .weight(1f)
-                            .heightIn(70.dp)
-                            .padding(0.dp, 10.dp)
-                            .padding(end = 4.dp)
-                    ) {
-                        Text(
-                            text = "Last Set",
-                            style = Typography.bodyMedium
-                        )
-                    }
+                            .fillMaxWidth()
+                    ) { // Selected workout + play button
+                        Row( // Machine display (box)
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                                .background(LightGrey)
+                                .weight(1f)
+                                .heightIn(80.dp)
+                                .padding(12.dp)
+                        ) {
+                            Column( // Machine title
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                Text(
+                                    text = "In queue for ${viewModel.currentMachine.value}",
+                                    style = Typography.bodyLarge
+                                )
 
-                    /*
-                   Next Machine button
-                   */
-                    Button(
-                        onClick = {
-                            controller.moveToNextMachine()
-                        },
-                        colors = ButtonDefaults.buttonColors(DarkGreen),
-                        shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
-                        modifier = Modifier
-                            .weight(1f)
-                            .heightIn(70.dp)
-                            .padding(0.dp, 10.dp)
-                            .padding(start = 4.dp)
-                    ) {
-                        Text(
-                            text = "Next Machine",
-                            style = Typography.bodyMedium
-                        )
-                    }
+                            }
 
+                            /*
+                            Refresh queue button
+                             */
+                            Button(
+                                onClick = { controller.refreshQueueStatus() },
+                                colors = ButtonDefaults.buttonColors(DarkGreen),
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .padding(vertical = 10.dp, horizontal = 6.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = "Refresh Queue",
+                                        tint = Color.White
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Refresh",
+                                        style = Typography.bodyMedium,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+
+
+
+                        }
+                    }
                 }
             }
 
@@ -296,7 +369,6 @@ fun HomeWorkoutView(
                                             tint = DarkGreen
                                         )
                                     }
-                                    println(viewModel.selectedWorkout.value.inQueue)
                                     if (machine in viewModel.selectedWorkout.value.inQueue) {
                                         Text(
                                             text = "Waiting in Queue",

@@ -20,6 +20,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var workoutOngoing = mutableStateOf(false)
     var timeStarted = mutableLongStateOf(System.currentTimeMillis())
     var currentMachine = mutableStateOf("")
+    var waiting = mutableStateOf(true)
 
     // Creating and Editing Workouts (Saved Page)
     var creatingWorkout = mutableStateOf(false)
@@ -36,11 +37,10 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     init {
         viewModelScope.launch {
             model.fetchDatabaseStuff()
+            model.fetchQueueAPIdata()
         }
         model.subscribe(this)
-//        model.fetchDatabaseStuff()
         addUser(model.userid) {}
-        model.fetchQueueAPIdata()
     }
 
     // Saved Workout Functions
@@ -78,16 +78,17 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         userid = model.userid
 
         // Today's Workout (Home)
+        selectedWorkout.value = model.selectedWorkout
         workoutOngoing.value = model.workoutOngoing
         timeStarted.longValue = model.timeStarted
         currentMachine.value = model.currentMachine
+        waiting.value = model.waiting
 
         // Editing Workouts
         creatingWorkout.value = model.creatingWorkout
         editingWorkout.value = model.editingWorkout
 
         // Queue Management
-        selectedWorkout.value = model.selectedWorkout
         userQueueCount.intValue = model.userQueueCount
         machineWaitTimes.value = model.machineWaitTimes
 
