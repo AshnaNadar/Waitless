@@ -60,63 +60,46 @@ class UserController(val model: UserModel) {
         }
     }
 
-        fun lastSet() {
-            refetchQueueAPIdata()
-            joinQueue(model.selectedWorkout.machines[1], model.userid) {}
-            model.selectedWorkout.inQueue.add(model.selectedWorkout.machines[1])
-        }
+    fun lastSet() {
+        refetchQueueAPIdata()
+        joinQueue(model.selectedWorkout.machines[1], model.userid) {}
+        model.selectedWorkout.inQueue.add(model.selectedWorkout.machines[1])
+    }
 
-        fun endWorkout() {
-            model.workoutOngoing = false
-            model.selectedWorkout.name = ""
-            model.currentMachine = ""
-            leaveAllQueues(model.userid) {}
-            model.selectedWorkout.inQueue.clear()
+    fun endWorkout() {
+        model.workoutOngoing = false
+        model.selectedWorkout.name = ""
+        model.currentMachine = ""
+        leaveAllQueues(model.userid) {}
+        model.selectedWorkout.inQueue.clear()
+        model.waiting = true
+    }
+
+    fun moveToNextMachine() {
+        model.currentMachine = model.selectedWorkout.machines[1]
+        model.selectedWorkout.machines = model.selectedWorkout.machines.drop(1).toMutableList()
+
+        refetchQueueAPIdata()
+        if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
+            model.timeStarted = System.currentTimeMillis()
+            model.waiting = false
+        } else if (model.machineWaitTimes[model.currentMachine] == 1) { // Check if current user is the one waiting in queue
+            getUserQueues(model.userid) { response ->
+                println(response.body()?.queues)
+                if (model.currentMachine in (response.body()?.queues ?: emptyList())) {
+                    leaveQueue(model.currentMachine, model.userid) {}
+                    model.timeStarted = System.currentTimeMillis()
+                    model.waiting = false
+                } else { // join queue and wait
+                    joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
+                    model.selectedWorkout.inQueue.add(model.currentMachine)
+                    model.waiting = true
+                }
+            }
+        } else { // join queue and wait
+            joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
             model.waiting = true
         }
 
-        fun moveToNextMachine() {
-            model.currentMachine = model.selectedWorkout.machines[1]
-            model.selectedWorkout.machines = model.selectedWorkout.machines.drop(1).toMutableList()
-
-            refetchQueueAPIdata()
-            if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
-                model.timeStarted = System.currentTimeMillis()
-                model.waiting = false
-            } else if (model.machineWaitTimes[model.currentMachine] == 1) { // Check if current user is the one waiting in queue
-                getUserQueues(model.userid) { response ->
-                    println(response.body()?.queues)
-                    if (model.currentMachine in (response.body()?.queues ?: emptyList())) {
-                        leaveQueue(model.currentMachine, model.userid) {}
-                        model.timeStarted = System.currentTimeMillis()
-                        model.waiting = false
-                    } else { // join queue and wait
-                        joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
-                        model.selectedWorkout.inQueue.add(model.currentMachine)
-                        model.waiting = true
-                    }
-                }
-            } else { // join queue and wait
-                joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
-                model.waiting = true
-            }
-
-        }
-
-        ////////////
-//        model.currentMachine = model.selectedWorkout.machines[1]
-//        joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
-//        model.selectedWorkout.inQueue.add(model.currentMachine)
-//
-//        if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
-//            leaveQueue(model.selectedWorkout.machines.first(), model.userid) {}
-//            model.selectedWorkout.machines = model.selectedWorkout.machines.drop(1).toMutableList()
-//            model.selectedWorkout.inQueue.remove(model.currentMachine)
-//            model.timeStarted = System.currentTimeMillis()
-//            model.waiting = false
-//            return true
-//        } else {
-//            model.waiting = true
-//            return false
-//        }
     }
+}
