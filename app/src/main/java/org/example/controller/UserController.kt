@@ -63,6 +63,7 @@ class UserController(val model: UserModel) {
     fun lastSet() {
         refetchQueueAPIdata()
         joinQueue(model.selectedWorkout.machines[1], model.userid) {}
+        refetchQueueAPIdata()
         model.selectedWorkout.inQueue.add(model.selectedWorkout.machines[1])
     }
 
