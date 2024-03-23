@@ -304,24 +304,6 @@ fun HomeWorkoutView(
                     text = "Upcoming Machines",
                     style = Typography.headlineSmall
                 )
-
-                /*
-                See All Button
-                    - routes to equipment info page (tmp)
-                */
-                TextButton(
-                    onClick = onEquipmentInfoClicked,
-                ) {
-                    Text(
-                        text = "See All",
-                        style = Typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        textDecoration = TextDecoration.Underline,
-                        color = DarkGreen ,
-                        modifier = Modifier
-                            .padding(bottom = 15.dp)
-                    )
-                }
             }
 
             Column( // Scrollable column to go through upcoming machines
