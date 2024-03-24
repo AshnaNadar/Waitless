@@ -15,7 +15,7 @@ import org.example.viewmodel.UserViewModel
 
 // Timeout constants in seconds
 
-const val LAST_SET_COUNTDOWN = 10 // time allocated for last set
+const val LAST_SET_COUNTDOWN = 2 * 60 // time allocated for last set
 const val FIRST_WARNING = 10 * 60 // time for first timeout popup display after current machine has started
 const val MOVE_TO_LAST_SET = 1 * 60 // time for auto kicking the user to last set countdown
 const val AUTO_DISMISS_POPUP_DELAY = 15 // time after which popups are auto dismissed
