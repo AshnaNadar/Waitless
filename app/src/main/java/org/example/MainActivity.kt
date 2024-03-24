@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import org.example.theme.WaitlessTheme
 import org.example.controller.UserController
 import org.example.model.UserModel
-import org.example.userinterface.UserViewModel
+import org.example.viewmodel.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

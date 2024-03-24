@@ -75,12 +75,22 @@ class UserModel : IPresenter() {
             field = value
             notifySubscribers()
         }
-    var timeStarted: Long = 0 // Start time of current ongoing machine
+    var machineStartTime: Long = 0 // Start time of current ongoing machine
         set(value) {
             field = value
             notifySubscribers()
         }
     var waiting: Boolean = true // Waiting for next machine during a workout
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var lastSet: Boolean = false // In the last set of current machine
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var lastSetStartTime: Long = 0 // Start time of Last Set current ongoing machine
         set(value) {
             field = value
             notifySubscribers()

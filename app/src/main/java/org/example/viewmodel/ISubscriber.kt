@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.viewmodel
 
 // Interface used by UserViewModel
 interface ISubscriber {

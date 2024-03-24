@@ -1,7 +1,6 @@
 package org.example.userinterface.Saved
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,7 +46,7 @@ import org.example.theme.DarkGreen
 import org.example.theme.*
 import org.example.theme.LightGrey
 import org.example.theme.Typography
-import org.example.userinterface.UserViewModel
+import org.example.viewmodel.UserViewModel
 
 // add button: https://www.composables.com/icons
 @Composable
