@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
