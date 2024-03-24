@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,8 +46,10 @@ import org.example.theme.Background
 import org.example.theme.DarkGreen
 import org.example.theme.LightGrey
 import org.example.theme.Typography
-import org.example.userinterface.UserViewModel
+import org.example.viewmodel.UserViewModel
 import kotlinx.coroutines.delay
+import org.example.userinterface.timeElapsedForMachine
+import org.example.userinterface.timeRemainingForLastSet
 
 @Composable
 fun HomeWorkoutView(
@@ -59,16 +60,6 @@ fun HomeWorkoutView(
 ) {
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
-
-    // Set up timer
-    var timeElapsed by remember { mutableIntStateOf(0) } // in seconds
-    LaunchedEffect(true) {
-        while (true) {
-            val timeElapsedSeconds = (System.currentTimeMillis() - viewModel.timeStarted.longValue) / 1000
-            timeElapsed = timeElapsedSeconds.toInt()
-            delay(1000)
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -116,8 +107,9 @@ fun HomeWorkoutView(
                 }
             }
 
-            // TOP SECTION
-            if (!viewModel.waiting.value) {
+            // TOP SECTION (Current Machine)
+
+            if (!viewModel.waiting.value && viewModel.currentMachine.value != "") {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -128,7 +120,7 @@ fun HomeWorkoutView(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
-                    ) { // Selected workout + play button
+                    ) { // Selected workout
                         Row( // Machine display (box)
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -148,7 +140,7 @@ fun HomeWorkoutView(
                                 )
 
                                 /*
-                                Info Button
+                                Info Button  // ??
                                     - routes to equipment info page
                                 */
                                 Button(
@@ -171,7 +163,7 @@ fun HomeWorkoutView(
                                 horizontalAlignment = Alignment.End
                             ) {
                                 Text(
-                                    text = "${timeElapsed / 60}:${String.format("%02d", timeElapsed % 60)}",
+                                    text = "${timeElapsedForMachine.intValue / 60}:${String.format("%02d", timeElapsedForMachine.intValue % 60)}",
                                     style = Typography.bodyLarge,
                                 )
                                 Text(
@@ -182,7 +174,50 @@ fun HomeWorkoutView(
                         }
                     }
 
-                    if (viewModel.selectedWorkout.value.machines.size > 1) {
+                    if (viewModel.lastSet.value) { // Display countdown timer if in last set
+                        Row (verticalAlignment = Alignment.CenterVertically) {
+
+                            Column( // Countdown Timer ??
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(
+                                    text = "Last Set Countdown",
+                                    style = Typography.bodyMedium
+                                )
+                                Text(
+                                    text = "${timeRemainingForLastSet.intValue / 60}:${String.format("%02d", timeRemainingForLastSet.intValue % 60)}",
+                                    style = Typography.bodyLarge,
+                                )
+                                Text(
+                                    text = "mins left",
+                                    style = Typography.bodyLarge
+                                )
+                            }
+
+                            if (viewModel.selectedWorkout.value.machines.size > 1) { // Show Next Machine only if more than machines in workout
+                                /*
+                               Next Machine button
+                               */
+                                Button(
+                                    onClick = {
+                                        controller.moveToNextMachine()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(DarkGreen),
+                                    shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .heightIn(70.dp)
+                                        .padding(0.dp, 10.dp)
+                                        .padding(start = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "Next Machine",
+                                        style = Typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                    } else {
                         Row (verticalAlignment = Alignment.CenterVertically) {
                             /*
                             Last Set button
@@ -203,31 +238,33 @@ fun HomeWorkoutView(
                                 )
                             }
 
-                            /*
-                           Next Machine button
-                           */
-                            Button(
-                                onClick = {
-                                    controller.moveToNextMachine()
-                                },
-                                colors = ButtonDefaults.buttonColors(DarkGreen),
-                                shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .heightIn(70.dp)
-                                    .padding(0.dp, 10.dp)
-                                    .padding(start = 4.dp)
-                            ) {
-                                Text(
-                                    text = "Next Machine",
-                                    style = Typography.bodyMedium
-                                )
+                            if (viewModel.selectedWorkout.value.machines.size > 1) { // Show Next Machine only if more than machines in workout
+                                /*
+                               Next Machine button
+                               */
+                                Button(
+                                    onClick = {
+                                        controller.moveToNextMachine()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(DarkGreen),
+                                    shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .heightIn(70.dp)
+                                        .padding(0.dp, 10.dp)
+                                        .padding(start = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "Next Machine",
+                                        style = Typography.bodyMedium
+                                    )
+                                }
                             }
-
                         }
                     }
                 }
-            } else { // If waiting for next machine
+
+            } else if (viewModel.waiting.value) { // If waiting (in queue) for next machine
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -238,7 +275,7 @@ fun HomeWorkoutView(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
-                    ) { // Selected workout + play button
+                    ) { // Selected workout
                         Row( // Machine display (box)
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -260,7 +297,7 @@ fun HomeWorkoutView(
                             }
 
                             /*
-                            Refresh queue button
+                            Refresh queue button  // ??
                              */
                             Button(
                                 onClick = { controller.refreshQueueStatus() },
@@ -291,9 +328,16 @@ fun HomeWorkoutView(
                         }
                     }
                 }
+            } else {
+                Text(
+                    text = "No more machines remaining",  // ??
+                    style = Typography.bodyLarge
+                )
             }
 
-            Row( // BOTTOM SECTION
+            // BOTTOM SECTION (Upcoming machines)
+
+            Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -353,7 +397,7 @@ fun HomeWorkoutView(
                                     }
                                     if (machine in viewModel.selectedWorkout.value.inQueue) {
                                         Text(
-                                            text = "Waiting in Queue",
+                                            text = "Waiting in Queue",  // ??
                                             style = Typography.bodyMedium
                                         )
                                     }
@@ -394,6 +438,7 @@ fun HomeWorkoutView(
         )
     }
 }
+
 
 // Old stop workout button:
 //                Button(

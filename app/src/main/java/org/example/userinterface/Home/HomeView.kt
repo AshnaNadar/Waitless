@@ -46,7 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.example.controller.UserController
 import org.example.theme.*
-import org.example.userinterface.UserViewModel
+import org.example.viewmodel.UserViewModel
 
 // info button: https://www.composables.com/icons
 @Composable
@@ -423,7 +423,7 @@ fun HomeView(
                         )
 
                         /*
-                        See All Button
+                        See All Button ??
                             - routes to saved workouts page
                         */
                         TextButton(

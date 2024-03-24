@@ -38,7 +38,7 @@ class UserController(val model: UserModel) {
             }
             model.waiting = true
         } else {
-            model.timeStarted = System.currentTimeMillis()
+            model.machineStartTime = System.currentTimeMillis()
             model.waiting = false
         }
     }
@@ -49,10 +49,9 @@ class UserController(val model: UserModel) {
             peopleWaiting = response.body()?.count ?: -1
             if (peopleWaiting == 1) {
                 getUserQueues(model.userid) { response ->
-                    println(response.body()?.queues)
                     if (model.currentMachine in (response.body()?.queues ?: emptyList())) { // Check if current user is the one waiting in queue
                         leaveQueue(model.currentMachine, model.userid) {}
-                        model.timeStarted = System.currentTimeMillis()
+                        model.machineStartTime = System.currentTimeMillis()
                         model.waiting = false
                     }
                 }
@@ -61,35 +60,47 @@ class UserController(val model: UserModel) {
     }
 
     fun lastSet() {
+        model.lastSet = true
+        model.lastSetStartTime = System.currentTimeMillis()
         refetchQueueAPIdata()
-        joinQueue(model.selectedWorkout.machines[1], model.userid) {}
-        refetchQueueAPIdata()
-        model.selectedWorkout.inQueue.add(model.selectedWorkout.machines[1])
+        if (model.selectedWorkout.machines.size > 1) { // If more machines remaining in workout
+            joinQueue(model.selectedWorkout.machines[1], model.userid) {}
+            refetchQueueAPIdata()
+            model.selectedWorkout.inQueue.add(model.selectedWorkout.machines[1])
+        }
     }
 
     fun endWorkout() {
         model.workoutOngoing = false
+        model.lastSet = false
         model.selectedWorkout.name = ""
+        model.selectedWorkout.machines = mutableListOf()
         model.currentMachine = ""
         leaveAllQueues(model.userid) {}
         model.selectedWorkout.inQueue.clear()
-        model.waiting = true
+        model.waiting = false
     }
 
     fun moveToNextMachine() {
+        if (model.selectedWorkout.machines.size <= 1) { // If no more machines remaining in workout
+            endWorkout()
+            return
+        }
+
+        println("moved to next machine")
+        model.lastSet = false
         model.currentMachine = model.selectedWorkout.machines[1]
         model.selectedWorkout.machines = model.selectedWorkout.machines.drop(1).toMutableList()
 
         refetchQueueAPIdata()
         if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
-            model.timeStarted = System.currentTimeMillis()
+            model.machineStartTime = System.currentTimeMillis()
             model.waiting = false
         } else if (model.machineWaitTimes[model.currentMachine] == 1) { // Check if current user is the one waiting in queue
             getUserQueues(model.userid) { response ->
-                println(response.body()?.queues)
                 if (model.currentMachine in (response.body()?.queues ?: emptyList())) {
                     leaveQueue(model.currentMachine, model.userid) {}
-                    model.timeStarted = System.currentTimeMillis()
+                    model.machineStartTime = System.currentTimeMillis()
                     model.waiting = false
                 } else { // join queue and wait
                     joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
