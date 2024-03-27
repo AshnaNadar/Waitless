@@ -9,6 +9,7 @@ import org.example.model.UserModel
 import org.example.model.Workout
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.example.model.Machine
 
 // Read all values needed in the UI from here
 class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
@@ -27,6 +28,10 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     // Creating and Editing Workouts (Saved Page)
     var creatingWorkout = mutableStateOf(false)
     var editingWorkout = mutableStateOf(false)
+
+    // Equipment Info
+    var selectedMachine = mutableStateOf(Machine("", "", "", false, 0, 0, 0, 0, 0, 0))
+    var allMachineData = mutableStateOf(emptyList<Machine>())
 
     // Queue Management Stuff
     var userQueueCount = mutableIntStateOf(12)
@@ -73,6 +78,11 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         model.removeMachine(machine)
     }
 
+    // Equipment Info
+    fun selectMachine(machineName: String) {
+        model.selectMachine(machineName)
+    }
+
     // Queue Management Functions
 
 
@@ -91,6 +101,10 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         // Editing Workouts
         creatingWorkout.value = model.creatingWorkout
         editingWorkout.value = model.editingWorkout
+
+        // Equipment Info
+        selectedMachine.value = model.selectedMachine
+        allMachineData.value = model.allMachineData
 
         // Queue Management
         userQueueCount.intValue = model.userQueueCount

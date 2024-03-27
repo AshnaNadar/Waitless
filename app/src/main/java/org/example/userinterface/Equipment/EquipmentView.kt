@@ -61,6 +61,7 @@ import org.example.theme.DarkGrey
 import org.example.theme.GreyText
 import org.example.theme.LightGrey
 import org.example.theme.Typography
+import org.example.userinterface.Home.rememberInfo
 import org.example.userinterface.Login.rememberClose
 import org.example.userinterface.Saved.rememberAdd
 import org.example.viewmodel.UserViewModel
@@ -306,26 +307,23 @@ fun EquipmentView(
                                 )
 
                                 /*
-                                View Info Button
-                                - routes to saved workouts page
+                                Info Button
+                                    - routes to equipment info page
                                 */
-                                TextButton(
-                                    onClick = onEquipmentClicked,
+                                Button(
+                                    onClick = {
+                                        viewModel.selectMachine(machineName)
+                                        onEquipmentClicked() },
+                                    shape = CircleShape,
+                                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                    modifier = Modifier.size(30.dp),
+                                    contentPadding = PaddingValues(0.dp),
                                 ) {
-                                    Text(
-                                        modifier = Modifier.drawBehind {
-                                            val strokeWidthPx = 1.dp.toPx()
-                                            val verticalOffset = size.height - 2.sp.toPx()
-                                            drawLine(
-                                                color = DarkGrey,
-                                                strokeWidth = strokeWidthPx,
-                                                start = Offset(0f, verticalOffset),
-                                                end = Offset(size.width, verticalOffset)
-                                            )
-                                        },
-                                        text = "View Info",
-                                        style = Typography.bodyMedium,
-                                        color = DarkGrey
+                                    Icon(
+                                        imageVector = rememberInfo(),
+                                        contentDescription = "edit",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = DarkGreen
                                     )
                                 }
                             }

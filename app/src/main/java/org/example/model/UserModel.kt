@@ -12,6 +12,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import QueueApiFunctions.joinQueue
 import android.util.Log
+import org.example.R
+import javax.crypto.Mac
 
 // All the values are stored here. UserController invokes this
 @Serializable
@@ -22,6 +24,19 @@ data class Exercise(
     val numberOfAvailableMachines: Int,
     val gymId: Int,
     val queueSize: Int)
+
+data class Machine (
+    val name: String,
+    val targetMuscleGroup: String, // new
+    val formDescription: String, // new
+    val workingStatus: Boolean, // new
+    val visual: Int, // new
+    val formVisual: Int, // new
+    val totalNumberOfMachines: Int,
+    val numberOfAvailableMachines: Int,
+    val gymId: Int,
+    val queueSize: Int
+)
 
 data class Workout(
     var name: String,
@@ -108,6 +123,49 @@ class UserModel : IPresenter() {
             notifySubscribers()
         }
 
+    // Equipment Info
+    var selectedMachine: Machine = Machine("", "", "", false, 0, 0, 0, 0, 0, 0)
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    /* TEMP FOR TESTING -- START */
+
+    var treadmillData = Machine(
+        name = "Treadmill",
+        targetMuscleGroup = "Quads, Glutes, Hamstrings, Calves",
+        formDescription = "Draw your shoulders back and engage your core as you slightly lean forward. " +
+                "Maintain an erect spine. Keep your shoulders directly above your hips. " +
+                "Relax your arms, gaze straight ahead, and avoid looking down or at the monitor.",
+        workingStatus = true,
+        visual = R.drawable.treadmill,
+        formVisual = R.drawable.treadmill,
+        totalNumberOfMachines = 17,
+        numberOfAvailableMachines = 38,
+        gymId = 1,
+        queueSize = 69
+    )
+
+    var chestpressData = Machine(
+        name = "Chestpress",
+        targetMuscleGroup = "Pectorals, Deltoids, Triceps",
+        formDescription = "Step on foot lever and grasp handles approximately 1.5x shoulder width. Release foot lever." +
+                "Slowly press forward until the arms are completely extended. " +
+                "Reverse the pattern and return to the starting position moving through a maximum, comfortable range of motion.",
+        workingStatus = false,
+        visual = R.drawable.chestpress,
+        formVisual = R.drawable.chestpress_form,
+        totalNumberOfMachines = 17,
+        numberOfAvailableMachines = 38,
+        gymId = 1,
+        queueSize = 69
+    )
+
+    var allMachineData: List<Machine> = listOf(treadmillData, chestpressData)
+
+    /* TEMP FOR TESTING -- END */
+
     // Queue API Stuff
     var userQueueCount: Int = 10
         set(value) {
@@ -149,14 +207,14 @@ class UserModel : IPresenter() {
     suspend fun fetchDatabaseStuff() {
         // add calls to Supabase here to get workouts, machine info, etc
         try {
-//            allMachines = listOf(
-//                "Treadmill",
+            allMachines = listOf(
+                "Treadmill",
 //                "Stationarybike",
 //                "Ellipticaltrainer",
 //                "Rowingmachine",
 //                "Smith machine",
 //                "Legpressmachine",
-//                "Chestpress",
+                "Chestpress",
 //                "Latpulldownmachine",
 //                "Legextensionmachine",
 //                "Legcurlmachine",
@@ -170,19 +228,19 @@ class UserModel : IPresenter() {
 //                "Assistedpull-up",
 //                "Smithmachine",
 //                "Hacksquatmachine"
-//            )
+            )
             // Get full list of Exercises
             val client = HttpClient()
             val gymId = 1
             val responseExercises: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/gyms/${gymId}/exercises")
             val exercises: String = responseExercises.body()
             val jsonArray = Json.parseToJsonElement(exercises).jsonArray
-            allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
+            //allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
 
             // Get Saved workouts
-            val userId = 5
-            val responseSavedWorkotus: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/user/${userId}")
-            val savedWorkoutsUser: String = responseSavedWorkotus.body()
+            val userId = 7
+            val responseSavedWorkouts: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/user/${userId}")
+            val savedWorkoutsUser: String = responseSavedWorkouts.body()
             val jsonArrayTmp = Json.parseToJsonElement(savedWorkoutsUser).jsonArray
             val workouts = jsonArrayTmp.map { workoutElement ->
                 val workoutName = workoutElement.jsonObject["name"]?.jsonPrimitive?.content ?: ""
@@ -294,6 +352,16 @@ class UserModel : IPresenter() {
     // removes machine from the selected workout
     fun removeMachine(machine: String) {
         selectedWorkout.machines.remove(machine)
+    }
+
+    // selects machine from allMachineData to display equipment info
+    fun selectMachine(machineName: String) {
+        allMachineData.forEach { machine ->
+            if (machine.name == machineName) {
+                selectedMachine = machine.copy()
+                return
+            }
+        }
     }
 
     // Queue Management Functions

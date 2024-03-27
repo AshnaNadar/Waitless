@@ -382,7 +382,9 @@ fun HomeWorkoutView(
                                     - routes to equipment info page
                                 */
                                     Button(
-                                        onClick = onEquipmentInfoClicked,
+                                        onClick = {
+                                            viewModel.selectMachine(machine)
+                                            onEquipmentInfoClicked() },
                                         shape = CircleShape,
                                         colors = ButtonDefaults.buttonColors(Color.Transparent),
                                         modifier = Modifier.size(30.dp),

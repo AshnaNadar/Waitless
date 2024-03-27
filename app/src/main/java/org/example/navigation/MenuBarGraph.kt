@@ -77,7 +77,10 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
                 userController = controller)
         }
         composable(route = MenuBarOptions.EquipmentInfo.route) {
-            EquipmentInfoView()
+            EquipmentInfoView(
+                userViewModel = viewModel,
+                userController = controller
+            )
         }
     }
 }

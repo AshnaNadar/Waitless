@@ -15,8 +15,8 @@ object QueueApiFunctions {
     // Initializing API interface
     private val retrofitBuilder: QueueApiInterface = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl("http://10.0.2.2:8000") // localhost for testing purposes
-//        .baseUrl("https://waitless-queue.onrender.com")
+       // .baseUrl("http://10.0.2.2:8000") // localhost for testing purposes
+        .baseUrl("https://waitless-queue.onrender.com")
         .build()
         .create(QueueApiInterface::class.java)
 
