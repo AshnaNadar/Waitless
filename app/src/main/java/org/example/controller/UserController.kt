@@ -5,8 +5,16 @@ import QueueApiFunctions.getUserQueues
 import QueueApiFunctions.joinQueue
 import QueueApiFunctions.leaveAllQueues
 import QueueApiFunctions.leaveQueue
-import kotlinx.coroutines.delay
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.runBlocking
 import org.example.model.UserModel
+import org.example.model.UserUpdate
 import org.example.model.Workout
 
 // If making changes to any variable via the frontend, invoke from here
@@ -101,6 +109,27 @@ class UserController(val model: UserModel) {
                 model.waiting = true
             }
 
+        }
+
+        fun updateUserInfo(body: UserUpdate) {
+            runBlocking {
+                val client = HttpClient() {
+                    install(ContentNegotiation) {
+                        json()
+                    }
+                }
+                client.put("https://cs346-server-d1175eb4edfc.herokuapp.com/sessions") {
+                    contentType(ContentType.Application.Json)
+                    setBody(body)
+                }
+
+                if (body.name.isNotEmpty()) {
+                    model.name = body.name
+                } else if (body.email.isNotEmpty()) {
+                    model.email = body.email
+                }
+                println("Updating User Info")
+            }
         }
 
         ////////////

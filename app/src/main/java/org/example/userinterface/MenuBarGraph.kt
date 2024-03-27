@@ -54,7 +54,8 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
         composable(route = MenuBarOptions.Settings.route) {
             SettingsView(
                 userViewModel = viewModel,
-                onSignOutClicked = { navController.navigate(MenuBarOptions.Login.route) }
+                onSignOutClicked = { navController.navigate(MenuBarOptions.Login.route) },
+                userController = controller
             )
         }
         composable(route = MenuBarOptions.Saved.route) {

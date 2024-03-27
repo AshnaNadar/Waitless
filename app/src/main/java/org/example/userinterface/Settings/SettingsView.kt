@@ -56,6 +56,8 @@ import org.example.userinterface.Login.rememberClose
 import org.example.userinterface.UserViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.example.controller.UserController
+import org.example.model.UserUpdate
 
 // forward arrow icon: https://www.composables.com/icons
 @Composable
@@ -175,9 +177,11 @@ fun rememberLogout(): ImageVector {
 @Composable
 fun SettingsView(
     userViewModel: UserViewModel,
-    onSignOutClicked: () -> Unit = {}
+    onSignOutClicked: () -> Unit = {},
+    userController: UserController
 ) {
     val viewModel by remember { mutableStateOf(userViewModel) }
+    val userController by remember { mutableStateOf(userController) }
     var showDialog by remember { mutableStateOf(false)}
     var dialogType by remember { mutableStateOf("")}
     val name by remember { mutableStateOf(viewModel.name.value)}
@@ -198,7 +202,7 @@ fun SettingsView(
             ) {
 
                 Text(
-                    text = name, /* CHANGE ME */
+                    text = viewModel.name.value, /* CHANGE ME */
                     style = Typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     color = Color.White,
@@ -235,7 +239,7 @@ fun SettingsView(
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = name, /* EDIT ME */
+                        text = viewModel.name.value, /* EDIT ME */
                         color = Color.Gray,
                         style = Typography.bodyLarge
                     )
@@ -276,7 +280,7 @@ fun SettingsView(
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = email, /* EDIT ME */
+                        text = viewModel.email.value, /* EDIT ME */
                         color = Color.Gray,
                         style = Typography.bodyLarge
                     )
@@ -432,6 +436,21 @@ fun SettingsView(
                     EditDialog(
                         onDismissRequest = { showDialog = false },
                         onConfirmation = {
+                            val body = UserUpdate(
+                                name = "",
+                                email = "",
+                                password = ""
+                            )
+                            if (dialogType === "Name") {
+                                body.name = it
+                            } else if (dialogType === "Email") {
+                                body.email
+                            } else if (dialogType === "Password") {
+                                body.password
+                            }
+                            println(body)
+                            userController.updateUserInfo(body)
+
                             /* EDIT ME: functionality based on dialogType */
                             showDialog = false },
                         newValue = "",

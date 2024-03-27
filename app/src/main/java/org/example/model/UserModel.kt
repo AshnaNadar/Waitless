@@ -14,6 +14,14 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 // All the values are stored here. UserController invokes this
+
+@Serializable
+data class UserUpdate(
+    var name: String,
+    var email: String,
+    var password: String
+)
+
 @Serializable
 data class Exercise(
     val name: String,
@@ -316,5 +324,5 @@ class UserModel : IPresenter() {
 
     // Queue Management Functions
 
-    
+
 }
