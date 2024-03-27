@@ -31,8 +31,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import org.example.userinterface.MenuBarGraph
-import org.example.userinterface.MenuBarOptions
+import org.example.navigation.MenuBarGraph
+import org.example.navigation.MenuBarOptions
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -41,7 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import org.example.controller.UserController
-import org.example.userinterface.UserViewModel
+import org.example.viewmodel.UserViewModel
 import org.example.theme.* // import all colors and themes
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

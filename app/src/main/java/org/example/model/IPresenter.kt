@@ -1,6 +1,6 @@
 package org.example.model
 
-import org.example.userinterface.ISubscriber
+import org.example.viewmodel.ISubscriber
 
 // Interface used by UserModel
 abstract class IPresenter {

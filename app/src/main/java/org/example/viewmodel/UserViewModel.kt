@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.viewmodel
 
 import QueueApiFunctions.addUser
 import androidx.compose.runtime.mutableIntStateOf
@@ -9,6 +9,7 @@ import org.example.model.UserModel
 import org.example.model.Workout
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.example.model.Machine
 
 // Read all values needed in the UI from here
 class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
@@ -18,13 +19,19 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     // Today's Workout (Home Page)
     var selectedWorkout = mutableStateOf(Workout("", mutableListOf<String>(), mutableSetOf<String>())) // Empty if no workout selected
     var workoutOngoing = mutableStateOf(false)
-    var timeStarted = mutableLongStateOf(System.currentTimeMillis())
+    var machineStartTime = mutableLongStateOf(System.currentTimeMillis())
     var currentMachine = mutableStateOf("")
     var waiting = mutableStateOf(true)
+    var lastSet = mutableStateOf(false)
+    var lastSetStartTime = mutableLongStateOf(System.currentTimeMillis())
 
     // Creating and Editing Workouts (Saved Page)
     var creatingWorkout = mutableStateOf(false)
     var editingWorkout = mutableStateOf(false)
+
+    // Equipment Info
+    var selectedMachine = mutableStateOf(Machine("", "", "", false, 0, 0, 0, 0, 0, 0))
+    var allMachineData = mutableStateOf(emptyList<Machine>())
 
     // Queue Management Stuff
     var userQueueCount = mutableIntStateOf(12)
@@ -75,6 +82,11 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         model.removeMachine(machine)
     }
 
+    // Equipment Info
+    fun selectMachine(machineName: String) {
+        model.selectMachine(machineName)
+    }
+
     // Queue Management Functions
 
     // Session Management Functions
@@ -89,13 +101,19 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         // Today's Workout (Home)
         selectedWorkout.value = model.selectedWorkout
         workoutOngoing.value = model.workoutOngoing
-        timeStarted.longValue = model.timeStarted
+        machineStartTime.longValue = model.machineStartTime
         currentMachine.value = model.currentMachine
         waiting.value = model.waiting
+        lastSet.value = model.lastSet
+        lastSetStartTime.longValue = model.lastSetStartTime
 
         // Editing Workouts
         creatingWorkout.value = model.creatingWorkout
         editingWorkout.value = model.editingWorkout
+
+        // Equipment Info
+        selectedMachine.value = model.selectedMachine
+        allMachineData.value = model.allMachineData
 
         // Queue Management
         userQueueCount.intValue = model.userQueueCount

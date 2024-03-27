@@ -1,4 +1,4 @@
-package org.example.userinterface
+package org.example.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,14 +12,19 @@ import org.example.userinterface.Equipment.EquipmentInfo.EquipmentInfoView
 import org.example.userinterface.Equipment.EquipmentView
 import org.example.userinterface.Home.HomeView
 import org.example.userinterface.Home.HomeWorkoutView
+import org.example.userinterface.LastSetCountdownTimer
 import org.example.userinterface.Login.LoginView
+import org.example.userinterface.OngoingWorkoutTimer
 import org.example.userinterface.Saved.SavedView
 import org.example.userinterface.Settings.SettingsView
+import org.example.viewmodel.UserViewModel
 
 @Composable
 fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, navController: NavHostController) {
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
+    LastSetCountdownTimer(viewModel, controller)
+    OngoingWorkoutTimer(viewModel, controller)
 
     NavHost(
         navController = navController,
@@ -76,7 +81,11 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
                 userController = controller)
         }
         composable(route = MenuBarOptions.EquipmentInfo.route) {
-            EquipmentInfoView()
+            EquipmentInfoView(
+                userViewModel = viewModel,
+                userController = controller
+            )
         }
     }
 }
+
