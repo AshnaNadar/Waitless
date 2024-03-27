@@ -69,6 +69,13 @@ data class Workout(
 
 class UserModel : IPresenter() {
 
+    // Equipment Id Map
+    var equipmentIdMap: List<Pair<Int, String>> = emptyList()
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
     // User Info
     var username: String = ""
         set(value) {
@@ -264,7 +271,8 @@ class UserModel : IPresenter() {
             val exercises: String = responseExercises.body()
             val jsonArray = Json.parseToJsonElement(exercises).jsonArray
             allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
-
+            equipmentIdMap = jsonArray.map {  (it.jsonObject["id"]!!.jsonPrimitive.intOrNull ?: -1 ) to it.jsonObject["name"]!!.jsonPrimitive.content}
+            println(equipmentIdMap)
             // Get sessions info
             val responseSessions: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/sessions")
             val sessions: String = responseSessions.body()
@@ -272,9 +280,9 @@ class UserModel : IPresenter() {
             println("Still good")
             name = jsonSessions.jsonObject["name"]?.jsonPrimitive?.content ?: ""
             email = jsonSessions.jsonObject["email"]?.jsonPrimitive?.content ?: ""
+            userId = jsonSessions.jsonObject["id"]?.jsonPrimitive?.intOrNull ?: 0
 
             // Get Saved workouts
-            val userId = 7
             val responseSavedWorkouts: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/user/${userId}")
             val savedWorkoutsUser: String = responseSavedWorkouts.body()
             val jsonArrayTmp = Json.parseToJsonElement(savedWorkoutsUser).jsonArray
