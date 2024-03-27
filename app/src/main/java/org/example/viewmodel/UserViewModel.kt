@@ -41,6 +41,10 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var savedWorkouts = mutableStateOf(emptyList<Workout>())
     var allMachineNames = mutableStateOf(emptyList<String>())
 
+    // Session information
+    var name = mutableStateOf("")
+    var email = mutableStateOf("")
+
     init {
         viewModelScope.launch {
             model.fetchDatabaseStuff()
@@ -85,6 +89,11 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
 
     // Queue Management Functions
 
+    // Session Management Functions
+
+    suspend fun signOut() {
+        model.signOut()
+    }
 
     override fun update() {
         userid = model.userid
@@ -113,5 +122,9 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         // Database Stuff
         savedWorkouts.value = model.savedWorkouts
         allMachineNames.value = model.allMachines
+
+        // Session information
+        name.value = model.name
+        email.value = model.email
     }
 }

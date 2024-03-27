@@ -4,9 +4,11 @@ import QueueApiFunctions.getQueueCount
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -16,6 +18,14 @@ import org.example.R
 import javax.crypto.Mac
 
 // All the values are stored here. UserController invokes this
+
+@Serializable
+data class UserUpdate(
+    var name: String,
+    var email: String,
+    var password: String
+)
+
 @Serializable
 data class Exercise(
     val name: String,
@@ -61,6 +71,24 @@ class UserModel : IPresenter() {
 
     // User Info
     var username: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var name: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var email: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var userId: Int = 0
         set(value) {
             field = value
             notifySubscribers()
@@ -300,6 +328,10 @@ class UserModel : IPresenter() {
 
 //        notifySubscribers()
     }
+    suspend fun signOut() {
+        val client = HttpClient()
+        client.post("https://cs346-server-d1175eb4edfc.herokuapp.com/auth/signout")
+    }
 
     // creates new Workout and adds it to savedWorkouts
     fun addWorkout(workoutName: String? = null) {
@@ -366,5 +398,5 @@ class UserModel : IPresenter() {
 
     // Queue Management Functions
 
-    
+
 }

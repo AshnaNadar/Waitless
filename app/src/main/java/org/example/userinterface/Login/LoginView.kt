@@ -214,7 +214,7 @@ fun LoginView(
                 OutlinedTextField(
                     password,
                     label = {Text(
-                        text = "Insert password",
+                        text = "Enter your password",
                         color = GreyText)},
                     onValueChange = { password = it },
                     shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
