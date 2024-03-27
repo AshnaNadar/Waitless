@@ -53,11 +53,11 @@ import org.example.theme.GreyText
 import org.example.theme.LightGrey
 import org.example.theme.Typography
 import org.example.userinterface.Login.rememberClose
-import org.example.userinterface.UserViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.example.controller.UserController
 import org.example.model.UserUpdate
+import org.example.viewmodel.UserViewModel
 
 // forward arrow icon: https://www.composables.com/icons
 @Composable
@@ -181,11 +181,9 @@ fun SettingsView(
     userController: UserController
 ) {
     val viewModel by remember { mutableStateOf(userViewModel) }
-    val userController by remember { mutableStateOf(userController) }
+    val controller by remember { mutableStateOf(userController) }
     var showDialog by remember { mutableStateOf(false)}
     var dialogType by remember { mutableStateOf("")}
-    val name by remember { mutableStateOf(viewModel.name.value)}
-    val email by remember { mutableStateOf(viewModel.email.value)}
 
     Scaffold() { innerPadding ->
         /* Contains all items for this screen. */
@@ -449,7 +447,7 @@ fun SettingsView(
                                 body.password
                             }
                             println(body)
-                            userController.updateUserInfo(body)
+                            controller.updateUserInfo(body)
 
                             /* EDIT ME: functionality based on dialogType */
                             showDialog = false },

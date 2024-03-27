@@ -57,7 +57,9 @@ class UserController(val model: UserModel) {
             peopleWaiting = response.body()?.count ?: -1
             if (peopleWaiting == 1) {
                 getUserQueues(model.userid) { response ->
-                    if (model.currentMachine in (response.body()?.queues ?: emptyList())) { // Check if current user is the one waiting in queue
+                    if (model.currentMachine in (response.body()?.queues
+                            ?: emptyList())
+                    ) { // Check if current user is the one waiting in queue
                         leaveQueue(model.currentMachine, model.userid) {}
                         model.machineStartTime = System.currentTimeMillis()
                         model.waiting = false
@@ -111,7 +113,10 @@ class UserController(val model: UserModel) {
                     model.machineStartTime = System.currentTimeMillis()
                     model.waiting = false
                 } else { // join queue and wait
-                    joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
+                    joinQueue(
+                        model.currentMachine,
+                        model.userid
+                    ) {} // in case Last Set was not clicked
                     model.selectedWorkout.inQueue.add(model.currentMachine)
                     model.waiting = true
                 }
@@ -120,56 +125,29 @@ class UserController(val model: UserModel) {
             joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
             model.waiting = true
         }
+    }
 
-        fun moveToNextMachine() {
-            model.currentMachine = model.selectedWorkout.machines[1]
-            model.selectedWorkout.machines = model.selectedWorkout.machines.drop(1).toMutableList()
-
-            refetchQueueAPIdata()
-            if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
-                model.timeStarted = System.currentTimeMillis()
-                model.waiting = false
-            } else if (model.machineWaitTimes[model.currentMachine] == 1) { // Check if current user is the one waiting in queue
-                getUserQueues(model.userid) { response ->
-                    println(response.body()?.queues)
-                    if (model.currentMachine in (response.body()?.queues ?: emptyList())) {
-                        leaveQueue(model.currentMachine, model.userid) {}
-                        model.timeStarted = System.currentTimeMillis()
-                        model.waiting = false
-                    } else { // join queue and wait
-                        joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
-                        model.selectedWorkout.inQueue.add(model.currentMachine)
-                        model.waiting = true
-                    }
+    fun updateUserInfo(body: UserUpdate) {
+        runBlocking {
+            val client = HttpClient() {
+                install(ContentNegotiation) {
+                    json()
                 }
-            } else { // join queue and wait
-                joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
-                model.waiting = true
+            }
+            client.put("https://cs346-server-d1175eb4edfc.herokuapp.com/sessions") {
+                contentType(ContentType.Application.Json)
+                setBody(body)
             }
 
-        }
-
-        fun updateUserInfo(body: UserUpdate) {
-            runBlocking {
-                val client = HttpClient() {
-                    install(ContentNegotiation) {
-                        json()
-                    }
-                }
-                client.put("https://cs346-server-d1175eb4edfc.herokuapp.com/sessions") {
-                    contentType(ContentType.Application.Json)
-                    setBody(body)
-                }
-
-                if (body.name.isNotEmpty()) {
-                    model.name = body.name
-                } else if (body.email.isNotEmpty()) {
-                    model.email = body.email
-                }
-                println("Updating User Info")
+            if (body.name.isNotEmpty()) {
+                model.name = body.name
+            } else if (body.email.isNotEmpty()) {
+                model.email = body.email
             }
+            println("Updating User Info")
         }
-
+    }
+}
         ////////////
 //        model.currentMachine = model.selectedWorkout.machines[1]
 //        joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
@@ -186,4 +164,3 @@ class UserController(val model: UserModel) {
 //            model.waiting = true
 //            return false
 //        }
-    }

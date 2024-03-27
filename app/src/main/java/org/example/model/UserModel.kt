@@ -263,7 +263,15 @@ class UserModel : IPresenter() {
             val responseExercises: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/gyms/${gymId}/exercises")
             val exercises: String = responseExercises.body()
             val jsonArray = Json.parseToJsonElement(exercises).jsonArray
-            //allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
+            allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
+
+            // Get sessions info
+            val responseSessions: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/sessions")
+            val sessions: String = responseSessions.body()
+            val jsonSessions = Json.parseToJsonElement(sessions)
+            println("Still good")
+            name = jsonSessions.jsonObject["name"]?.jsonPrimitive?.content ?: ""
+            email = jsonSessions.jsonObject["email"]?.jsonPrimitive?.content ?: ""
 
             // Get Saved workouts
             val userId = 7
