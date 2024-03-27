@@ -1,11 +1,7 @@
 package org.example.userinterface.Settings
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,14 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -40,8 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathFillType
@@ -52,8 +43,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -63,10 +52,10 @@ import org.example.theme.DarkGrey
 import org.example.theme.GreyText
 import org.example.theme.LightGrey
 import org.example.theme.Typography
-import org.example.userinterface.Equipment.NameWorkoutDialog
-import org.example.userinterface.Equipment.rememberRemove
 import org.example.userinterface.Login.rememberClose
-import org.example.userinterface.Saved.rememberAdd
+import org.example.userinterface.UserViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 // forward arrow icon: https://www.composables.com/icons
 @Composable
@@ -184,9 +173,15 @@ fun rememberLogout(): ImageVector {
 }
 
 @Composable
-fun SettingsView() {
+fun SettingsView(
+    userViewModel: UserViewModel,
+    onSignOutClicked: () -> Unit = {}
+) {
+    val viewModel by remember { mutableStateOf(userViewModel) }
     var showDialog by remember { mutableStateOf(false)}
     var dialogType by remember { mutableStateOf("")}
+    val name by remember { mutableStateOf(viewModel.name.value)}
+    val email by remember { mutableStateOf(viewModel.email.value)}
 
     Scaffold() { innerPadding ->
         /* Contains all items for this screen. */
@@ -203,7 +198,7 @@ fun SettingsView() {
             ) {
 
                 Text(
-                    text = "[Name Here]", /* CHANGE ME */
+                    text = name, /* CHANGE ME */
                     style = Typography.titleLarge,
                     fontWeight = FontWeight.Medium,
                     color = Color.White,
@@ -240,7 +235,7 @@ fun SettingsView() {
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = "[Name Here]", /* EDIT ME */
+                        text = name, /* EDIT ME */
                         color = Color.Gray,
                         style = Typography.bodyLarge
                     )
@@ -281,7 +276,7 @@ fun SettingsView() {
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = "[testemail@gmail.com]", /* EDIT ME */
+                        text = email, /* EDIT ME */
                         color = Color.Gray,
                         style = Typography.bodyLarge
                     )
@@ -409,6 +404,10 @@ fun SettingsView() {
                     IconButton(
                         onClick = {
                             /* EDIT ME: sign out functionality */
+                            viewModel.viewModelScope.launch {
+                                viewModel.signOut()
+                                onSignOutClicked()
+                            }
                         },
                         modifier = Modifier.size(30.dp),
                     ) {

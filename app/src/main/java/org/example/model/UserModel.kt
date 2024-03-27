@@ -4,14 +4,14 @@ import QueueApiFunctions.getQueueCount
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import QueueApiFunctions.joinQueue
-import android.util.Log
 
 // All the values are stored here. UserController invokes this
 @Serializable
@@ -46,6 +46,24 @@ class UserModel : IPresenter() {
 
     // User Info
     var username: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var name: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var email: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var userId: Int = 0
         set(value) {
             field = value
             notifySubscribers()
@@ -166,11 +184,17 @@ class UserModel : IPresenter() {
             val gymId = 1
             val responseExercises: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/gyms/${gymId}/exercises")
             val exercises: String = responseExercises.body()
-            val jsonArray = Json.parseToJsonElement(exercises).jsonArray
-            allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
+            val exercisesJson = Json.parseToJsonElement(exercises).jsonArray
+            allMachines = exercisesJson.map { it.jsonObject["name"]!!.jsonPrimitive.content }
 
             // Get Saved workouts
-            val userId = 5
+            val responseSessions: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/sessions")
+            val sessions: String = responseSessions.body()
+            val sessionsJson = Json.parseToJsonElement(sessions)
+
+            userId = sessionsJson.jsonObject["id"]?.jsonPrimitive?.intOrNull ?: 0
+            name = sessionsJson.jsonObject["name"]?.jsonPrimitive?.content ?: ""
+            email = sessionsJson.jsonObject["email"]?.jsonPrimitive?.content ?: ""
             val responseSavedWorkotus: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/user/${userId}")
             val savedWorkoutsUser: String = responseSavedWorkotus.body()
             val jsonArrayTmp = Json.parseToJsonElement(savedWorkoutsUser).jsonArray
@@ -231,6 +255,10 @@ class UserModel : IPresenter() {
 //        )
 
 //        notifySubscribers()
+    }
+    suspend fun signOut() {
+        val client = HttpClient()
+        client.post("https://cs346-server-d1175eb4edfc.herokuapp.com/auth/signout")
     }
 
     // creates new Workout and adds it to savedWorkouts
