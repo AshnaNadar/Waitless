@@ -30,7 +30,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var editingWorkout = mutableStateOf(false)
 
     // Equipment Info
-    var selectedMachine = mutableStateOf(Machine("", "", "", false, 0, 0, 0, 0, 0, 0))
+    var selectedMachine = mutableStateOf(Machine(0, "", null, 0, 0, 0, 0, "", "", false, 0))
     var allMachineData = mutableStateOf(emptyList<Machine>())
 
     // Queue Management Stuff

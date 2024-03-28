@@ -158,7 +158,7 @@ fun EquipmentInfoView(
                         modifier = Modifier
                             .height(300.dp)
                             .align(Alignment.CenterHorizontally),
-                        painter = painterResource(id = viewModel.selectedMachine.value.visual), /* EDIT ME: retrieve from server */
+                        painter = painterResource(id = R.drawable.treadmill), /* EDIT ME: retrieve from web */
                         contentDescription = stringResource(id = R.string.machine_image)
                 )
 
@@ -182,7 +182,7 @@ fun EquipmentInfoView(
 
                     Text(
                         modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp),
-                        text = viewModel.selectedMachine.value.targetMuscleGroup, /* EDIT ME: retrieve from server */
+                        text = viewModel.selectedMachine.value.targetMuscleGroup,
                         textAlign = TextAlign.End,
                         color = Color.Gray,
                         style = Typography.bodyLarge
@@ -210,7 +210,7 @@ fun EquipmentInfoView(
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = viewModel.selectedMachine.value.numberOfAvailableMachines.toString(), /* EDIT ME: retrieve from server */
+                        text = viewModel.selectedMachine.value.numberOfMachinesAvailable.toString(),
                         color = Color.Gray,
                         style = Typography.bodyLarge
                     )
@@ -241,7 +241,7 @@ fun EquipmentInfoView(
                                    "In Service"
                                } else {
                                    "Out of Order"
-                               }, /* EDIT ME: retrieve from server */
+                               },
                         color = Color.Gray,
                         style = Typography.bodyLarge
                     )
@@ -252,7 +252,7 @@ fun EquipmentInfoView(
                     modifier = Modifier
                         .height(300.dp)
                         .align(Alignment.CenterHorizontally),
-                    painter = painterResource(id = viewModel.selectedMachine.value.formVisual), /* EDIT ME: retrieve from server */
+                    painter = painterResource(id = R.drawable.treadmill), /* EDIT ME: retrieve from web */
                     contentDescription = stringResource(id = R.string.machine_image)
                 )
 
@@ -263,8 +263,8 @@ fun EquipmentInfoView(
                         .background(LightGrey)
                         .padding(10.dp)
                 ) {
-                    Text( /* EDIT ME: retrieve from server */
-                        text = viewModel.selectedMachine.value.formDescription, /* EDIT ME: retrieve from server */
+                    Text(
+                        text = viewModel.selectedMachine.value.formDescription,
                         color = DarkGrey,
                         style = Typography.bodyLarge
                     )
