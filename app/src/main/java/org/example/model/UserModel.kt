@@ -14,7 +14,10 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import QueueApiFunctions.joinQueue
 import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.example.R
+import org.json.JSONArray
 import javax.crypto.Mac
 
 // All the values are stored here. UserController invokes this
@@ -26,6 +29,7 @@ data class UserUpdate(
     var password: String
 )
 
+// can we remove this
 @Serializable
 data class Exercise(
     val name: String,
@@ -36,16 +40,17 @@ data class Exercise(
     val queueSize: Int)
 
 data class Machine (
+    val id: Int,
     val name: String,
-    val targetMuscleGroup: String, // new
-    val formDescription: String, // new
-    val workingStatus: Boolean, // new
-    val visual: Int, // new
-    val formVisual: Int, // new
+    val description: String?,
     val totalNumberOfMachines: Int,
-    val numberOfAvailableMachines: Int,
+    val numberOfMachinesAvailable: Int,
     val gymId: Int,
-    val queueSize: Int
+    val queueSize: Int,
+    val targetMuscleGroup: String,
+    val formDescription: String,
+    val workingStatus: Boolean,
+    val formVisual: Int
 )
 
 data class Workout(
@@ -159,15 +164,17 @@ class UserModel : IPresenter() {
         }
 
     // Equipment Info
-    var selectedMachine: Machine = Machine("", "", "", false, 0, 0, 0, 0, 0, 0)
+    var selectedMachine: Machine = Machine(0, "", null, 0, 0, 0, 0, "", "", false, 0)
         set(value) {
             field = value
             notifySubscribers()
         }
 
     /* TEMP FOR TESTING -- START */
+    /*
 
     var treadmillData = Machine(
+        id = 10,
         name = "Treadmill",
         targetMuscleGroup = "Quads, Glutes, Hamstrings, Calves",
         formDescription = "Draw your shoulders back and engage your core as you slightly lean forward. " +
@@ -183,6 +190,7 @@ class UserModel : IPresenter() {
     )
 
     var chestpressData = Machine(
+        id = 11,
         name = "Chestpress",
         targetMuscleGroup = "Pectorals, Deltoids, Triceps",
         formDescription = "Step on foot lever and grasp handles approximately 1.5x shoulder width. Release foot lever." +
@@ -196,8 +204,10 @@ class UserModel : IPresenter() {
         gymId = 1,
         queueSize = 69
     )
+     */
 
-    var allMachineData: List<Machine> = listOf(treadmillData, chestpressData)
+    //var allMachineData: List<Machine> = listOf(treadmillData, chestpressData)
+    var allMachineData: MutableList<Machine> = emptyList<Machine>().toMutableList()
 
     /* TEMP FOR TESTING -- END */
 
@@ -227,6 +237,7 @@ class UserModel : IPresenter() {
         }
     }
 
+    // can we remove this pt. 2 boogaloo
     suspend fun fetchHerokuData(client: HttpClient) {
         try {
             val gym_id = 1
@@ -243,13 +254,13 @@ class UserModel : IPresenter() {
         // add calls to Supabase here to get workouts, machine info, etc
         try {
             allMachines = listOf(
-                "Treadmill",
+//                "Treadmill",
 //                "Stationarybike",
 //                "Ellipticaltrainer",
 //                "Rowingmachine",
 //                "Smith machine",
 //                "Legpressmachine",
-                "Chestpress",
+//                "Chestpress",
 //                "Latpulldownmachine",
 //                "Legextensionmachine",
 //                "Legcurlmachine",
@@ -270,9 +281,14 @@ class UserModel : IPresenter() {
             val responseExercises: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/gyms/${gymId}/exercises")
             val exercises: String = responseExercises.body()
             val jsonArray = Json.parseToJsonElement(exercises).jsonArray
+
+            val gson = Gson()
+            val listType = object : TypeToken<List<Machine>>() {}.type
+            allMachineData = gson.fromJson(jsonArray.toString(), listType)
+
             allMachines = jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content }
             equipmentIdMap = jsonArray.map {  (it.jsonObject["id"]!!.jsonPrimitive.intOrNull ?: -1 ) to it.jsonObject["name"]!!.jsonPrimitive.content}
-            println(equipmentIdMap)
+            Log.d("UserModel.kt", "$equipmentIdMap")
             // Get sessions info
             val responseSessions: HttpResponse = client.get("https://cs346-server-d1175eb4edfc.herokuapp.com/sessions")
             val sessions: String = responseSessions.body()
