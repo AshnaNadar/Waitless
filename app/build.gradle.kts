@@ -88,4 +88,7 @@ dependencies {
     implementation("io.ktor:ktor-client-resources:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
+    // Google plat store location servies
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 }

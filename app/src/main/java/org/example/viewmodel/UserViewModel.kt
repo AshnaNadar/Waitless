@@ -1,6 +1,7 @@
 package org.example.viewmodel
 
 import QueueApiFunctions.addUser
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,11 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var userid: String = ""
 
     // Today's Workout (Home Page)
+    var canStartWorkout = mutableStateOf(false)
+        private set // Optional: Makes the setter private to restrict modifications from outside the ViewModel.
+
+    val showDialog: MutableState<Boolean> = mutableStateOf(false)
+
     var selectedWorkout = mutableStateOf(Workout("", mutableListOf<String>(), mutableSetOf<String>())) // Empty if no workout selected
     var workoutOngoing = mutableStateOf(false)
     var machineStartTime = mutableLongStateOf(System.currentTimeMillis())
@@ -52,6 +58,15 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         }
         model.subscribe(this)
         addUser(model.userid) {}
+    }
+
+    // Location Services
+    fun updateCanStartWorkout(canStart: Boolean) {
+        canStartWorkout.value = canStart
+    }
+
+    fun updateShowDialog(show: Boolean) {
+        showDialog.value = show
     }
 
     // Saved Workout Functions

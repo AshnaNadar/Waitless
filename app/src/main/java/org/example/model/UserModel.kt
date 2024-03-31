@@ -13,10 +13,12 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import QueueApiFunctions.joinQueue
+import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.example.R
+import org.example.utils.LocationUtils
 import org.json.JSONArray
 import javax.crypto.Mac
 
@@ -73,6 +75,11 @@ data class Workout(
 }
 
 class UserModel : IPresenter() {
+    companion object {
+        // Hardcoded gym location coordinates
+        private const val TARGET_LAT = 40.712776 // Replace with your gym's latitude
+        private const val TARGET_LON = -74.005974 // Replace with your gym's longitude
+    }
 
     // Equipment Id Map
     var equipmentIdMap: List<Pair<Int, String>> = emptyList()
@@ -169,6 +176,20 @@ class UserModel : IPresenter() {
             field = value
             notifySubscribers()
         }
+
+    // New method to check if the user is within the allowed radius to join the queue
+    fun checkUserProximityToJoinQueue(context: Context, onResult: (Boolean) -> Unit) {
+        LocationUtils.getUserLocation(context) { location ->
+            location?.let {
+                // If location is retrieved successfully, check if within range
+                val isWithinRange = LocationUtils.isWithinLocationRange(it, TARGET_LAT, TARGET_LON)
+                onResult(isWithinRange)
+            } ?: run {
+                // If location is null, the permission might not have been granted or the location couldn't be retrieved
+                onResult(false)
+            }
+        }
+    }
 
     /* TEMP FOR TESTING -- START */
     /*

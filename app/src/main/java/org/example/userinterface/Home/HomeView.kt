@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -251,6 +252,7 @@ fun HomeView(
     onSeeAllClicked: () -> Unit = {},
     onStartClicked: () -> Unit = {},
 ) {
+    val canStartWorkout = userViewModel.canStartWorkout.value
 
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
@@ -386,8 +388,15 @@ fun HomeView(
                             - starts the selected workout
                         */
                         Button(
-                            onClick = {onStartClicked()
-                                controller.startWorkout()},
+                            onClick = {
+                                if (canStartWorkout) {
+                                    onStartClicked()
+                                    controller.startWorkout()
+                                } else {
+                                    // Trigger showing the dialog or handling the case when the workout cannot start.
+                                    userViewModel.canStartWorkout.value = false // Example action, adjust as needed
+                                }
+                            },
                             shape = CircleShape,
                             colors = ButtonDefaults.buttonColors(DarkGreen),
                             modifier = Modifier
@@ -496,3 +505,16 @@ fun HomeView(
     }
 }
 
+@Composable
+fun ShowLocationRequiredDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Location Required") },
+        text = { Text("You need to be at the gym to start a workout.") },
+        confirmButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("OK")
+            }
+        }
+    )
+}
