@@ -389,6 +389,21 @@ class UserModel : IPresenter() {
             selectedWorkout.name = workoutName
             savedWorkouts.add(selectedWorkout.copy())
             currentMachine = selectedWorkout.machines.first() // newly added workout remains selected
+            runBlocking {
+                val client = HttpClient() {
+                    install(ContentNegotiation) {
+                        json()
+                    }
+                }
+                val body = createWorkoutBody(
+                    workout = exposedWorkout(selectedWorkout.name, userId),
+                    exercises = selectedWorkout.machineIds
+                )
+                client.post("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts") {
+                    contentType(ContentType.Application.Json)
+                    setBody(body)
+                }
+            }
             creatingWorkout = false
         }
     }
@@ -416,7 +431,7 @@ class UserModel : IPresenter() {
     )
 
     @Serializable
-    data class editWorkoutBody(
+    data class createWorkoutBody(
         val workout: exposedWorkout,
         val exercises: List<Int>
     )
@@ -431,24 +446,20 @@ class UserModel : IPresenter() {
                     savedWorkouts[i] = selectedWorkout.copy()
                     println("editWorkout")
                     println(selectedWorkout.copy())
-                    //TODO: Make call to supabase to update workout
                     runBlocking {
                         val client = HttpClient() {
                             install(ContentNegotiation) {
                                 json()
                             }
                         }
-                        val body = editWorkoutBody(
+                        val body = createWorkoutBody(
                             workout = exposedWorkout(selectedWorkout.name, userId),
                             exercises = selectedWorkout.machineIds
                         )
-                        Log.d("editWorkout", body.toString())
-                        Log.d("editWorkout", selectedWorkout.id.toString())
                         client.put("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/${selectedWorkout.id}") {
                             contentType(ContentType.Application.Json)
                             setBody(body)
                         }
-                        Log.d("editWorkout", "Finished request")
                     }
                 }
             }
