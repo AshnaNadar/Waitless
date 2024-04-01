@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.example.MainActivity
 import org.example.controller.UserController
 import org.example.theme.*
 import org.example.viewmodel.UserViewModel
@@ -253,6 +255,15 @@ fun HomeView(
     onStartClicked: () -> Unit = {},
 ) {
     val canStartWorkout = userViewModel.canStartWorkout.value
+    val showDialog = userViewModel.showDialog.value
+
+
+    LaunchedEffect(showDialog) {
+        if (showDialog) {
+            userViewModel.updateShowLocationDialog(false) // Reset the dialog to not show after being handled
+        }
+    }
+
 
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
@@ -391,10 +402,10 @@ fun HomeView(
                             onClick = {
                                 if (canStartWorkout) {
                                     onStartClicked()
-                                    controller.startWorkout()
+                                    userController.startWorkout()
                                 } else {
-                                    // Trigger showing the dialog or handling the case when the workout cannot start.
-                                    userViewModel.canStartWorkout.value = false // Example action, adjust as needed
+                                    // trigger location services (request to turn on location services) - help me call heckAndRequestLocationPermissions() from MainActivity here
+                                    userViewModel.updateShowDialog(true)
                                 }
                             },
                             shape = CircleShape,

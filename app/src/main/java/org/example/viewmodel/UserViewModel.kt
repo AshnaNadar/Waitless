@@ -12,6 +12,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import org.example.model.Machine
 
+interface LocationRequester {
+    fun requestLocationPermission()
+}
+
 // Read all values needed in the UI from here
 class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     // User Info
@@ -21,6 +25,11 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var canStartWorkout = mutableStateOf(false)
         private set // Optional: Makes the setter private to restrict modifications from outside the ViewModel.
 
+    var locationRequester: (() -> Unit)? = null
+    val showLocationDialog: MutableState<Boolean> = mutableStateOf(false)
+    fun updateShowLocationDialog(show: Boolean) {
+        showLocationDialog.value = show
+    }
     val showDialog: MutableState<Boolean> = mutableStateOf(false)
 
     var selectedWorkout = mutableStateOf(Workout("", mutableListOf<String>(), mutableSetOf<String>())) // Empty if no workout selected
