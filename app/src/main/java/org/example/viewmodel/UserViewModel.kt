@@ -17,7 +17,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var userid: String = ""
 
     // Today's Workout (Home Page)
-    var selectedWorkout = mutableStateOf(Workout("", mutableListOf<String>(), mutableSetOf<String>())) // Empty if no workout selected
+    var selectedWorkout = mutableStateOf(Workout(0, "", mutableListOf<Int>(), mutableListOf<String>())) // Empty if no workout selected
     var workoutOngoing = mutableStateOf(false)
     var machineStartTime = mutableLongStateOf(System.currentTimeMillis())
     var currentMachine = mutableStateOf("")
@@ -74,12 +74,12 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         return model.noMachinesAdded()
     }
 
-    fun addMachine(machine: String) {
-        model.addMachine(machine)
+    fun addMachine(id: Int, name: String) {
+        model.addMachine(id, name)
     }
 
-    fun removeMachine(machine: String) {
-        model.removeMachine(machine)
+    fun removeMachine(id: Int, name: String) {
+        model.removeMachine(id, name)
     }
 
     // Equipment Info

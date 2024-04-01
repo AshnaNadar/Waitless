@@ -12,13 +12,16 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import QueueApiFunctions.joinQueue
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import org.example.R
-import org.json.JSONArray
-import javax.crypto.Mac
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.runBlocking
 
 // All the values are stored here. UserController invokes this
 
@@ -54,21 +57,27 @@ data class Machine (
 )
 
 data class Workout(
+    var id: Int,
     var name: String,
+    var machineIds: MutableList<Int>,
     var machines: MutableList<String>,
     var inQueue: MutableSet<String>
 ) {
-    constructor(name: String, machines: MutableList<String>) : this (
+    constructor(id: Int, name: String, machinesIds: MutableList<Int>, machines: MutableList<String>) : this (
+        id = id,
         name = name,
         machines = machines,
-        inQueue = mutableSetOf<String>()
+        machineIds = machinesIds,
+        inQueue = mutableSetOf<String>() // Initialize inQueue here
     )
     fun copy(): Workout { // For deep copy
         val newMachines = mutableListOf<String>()
         newMachines.addAll(machines)
+        val newMachineIds = mutableListOf<Int>()
+        newMachineIds.addAll(machineIds)
         val newQueue = mutableSetOf<String>()
         newQueue.addAll(inQueue)
-        return Workout(name, newMachines, newQueue)
+        return Workout(id, name, newMachineIds, newMachines, newQueue)
     }
 }
 
@@ -115,7 +124,7 @@ class UserModel : IPresenter() {
     var userid: String = "20871851"
 
     // Today's Workout (Home Page)
-    var selectedWorkout: Workout = Workout("", mutableListOf<String>())
+    var selectedWorkout: Workout = Workout(0, "", mutableListOf<Int>(), mutableListOf<String>())
         set(value) {
             field = value
             notifySubscribers()
@@ -303,16 +312,22 @@ class UserModel : IPresenter() {
             val savedWorkoutsUser: String = responseSavedWorkouts.body()
             val jsonArrayTmp = Json.parseToJsonElement(savedWorkoutsUser).jsonArray
             val workouts = jsonArrayTmp.map { workoutElement ->
+                val workoutId = workoutElement.jsonObject["id"]?.jsonPrimitive?.intOrNull ?: 0
                 val workoutName = workoutElement.jsonObject["name"]?.jsonPrimitive?.content ?: ""
                 val exercisesJsonArray = workoutElement.jsonObject["exercises"]?.jsonArray
+
+                val exerciseIds = exercisesJsonArray?.mapNotNull { exercise ->
+                    exercise.jsonObject["id"]?.jsonPrimitive?.intOrNull
+                } ?: emptyList()
 
                 val exerciseNames = exercisesJsonArray?.mapNotNull { exercise ->
                     exercise.jsonObject["name"]?.jsonPrimitive?.content
                 } ?: emptyList()
 
-                Workout(workoutName, exerciseNames.toMutableList())
+                Workout(workoutId, workoutName, exerciseIds.toMutableList(), exerciseNames.toMutableList())
             }
             savedWorkouts = workouts.toMutableList()
+            println(savedWorkouts)
             notifySubscribers()
         } catch (e: Exception) {
             println("Failed to retrieve data from Heroku: ${e.message}")
@@ -374,6 +389,21 @@ class UserModel : IPresenter() {
             selectedWorkout.name = workoutName
             savedWorkouts.add(selectedWorkout.copy())
             currentMachine = selectedWorkout.machines.first() // newly added workout remains selected
+            runBlocking {
+                val client = HttpClient() {
+                    install(ContentNegotiation) {
+                        json()
+                    }
+                }
+                val body = createWorkoutBody(
+                    workout = exposedWorkout(selectedWorkout.name, userId),
+                    exercises = selectedWorkout.machineIds
+                )
+                client.post("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts") {
+                    contentType(ContentType.Application.Json)
+                    setBody(body)
+                }
+            }
             creatingWorkout = false
         }
     }
@@ -393,6 +423,18 @@ class UserModel : IPresenter() {
         currentMachine = ""
     }
 
+
+    @Serializable
+    data class exposedWorkout(
+        val name: String,
+        val user: Int
+    )
+
+    @Serializable
+    data class createWorkoutBody(
+        val workout: exposedWorkout,
+        val exercises: List<Int>
+    )
     fun editWorkout(workout: Workout? = null) {
         if (workout != null) { // select workout to edit
             editingWorkout = true
@@ -402,6 +444,23 @@ class UserModel : IPresenter() {
             savedWorkouts.forEachIndexed { i, savedWorkout ->
                 if (savedWorkout.name == selectedWorkout.name) {
                     savedWorkouts[i] = selectedWorkout.copy()
+                    println("editWorkout")
+                    println(selectedWorkout.copy())
+                    runBlocking {
+                        val client = HttpClient() {
+                            install(ContentNegotiation) {
+                                json()
+                            }
+                        }
+                        val body = createWorkoutBody(
+                            workout = exposedWorkout(selectedWorkout.name, userId),
+                            exercises = selectedWorkout.machineIds
+                        )
+                        client.put("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/${selectedWorkout.id}") {
+                            contentType(ContentType.Application.Json)
+                            setBody(body)
+                        }
+                    }
                 }
             }
             removeWorkout() // remove selected workout
@@ -409,13 +468,15 @@ class UserModel : IPresenter() {
     }
 
     // adds machine to the selected workout
-    fun addMachine(machine: String) {
-        selectedWorkout.machines.add(machine)
+    fun addMachine(id: Int, name: String) {
+        selectedWorkout.machines.add(name)
+        selectedWorkout.machineIds.add(id)
     }
 
     // removes machine from the selected workout
-    fun removeMachine(machine: String) {
-        selectedWorkout.machines.remove(machine)
+    fun removeMachine(id: Int, name: String) {
+        selectedWorkout.machines.remove(name)
+        selectedWorkout.machineIds.remove(id)
     }
 
     // selects machine from allMachineData to display equipment info

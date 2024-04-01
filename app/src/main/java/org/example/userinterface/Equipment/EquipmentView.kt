@@ -237,7 +237,7 @@ fun EquipmentView(
                     .verticalScroll(rememberScrollState())
                     .weight(1f, false)
             ) {
-                viewModel.allMachineNames.value.forEach { machineName ->
+                viewModel.allMachineData.value.forEach { machine ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -251,14 +251,14 @@ fun EquipmentView(
                                 - adds machine to last Workout in savedWorkouts
                             */
                             var machineAdded by remember { mutableStateOf(
-                                viewModel.selectedWorkout.value.machines.contains(machineName)) }
+                                viewModel.selectedWorkout.value.machines.contains(machine.name)) }
                             
                             IconButton(
                                 onClick = {
                                     if (!machineAdded) {
-                                        viewModel.addMachine(machineName)
+                                        viewModel.addMachine(machine.id, machine.name)
                                     } else {
-                                        viewModel.removeMachine(machineName)
+                                        viewModel.removeMachine(machine.id, machine.name)
                                     }
                                     machineAdded = !machineAdded },
                                 colors = if (!machineAdded) {
@@ -302,7 +302,7 @@ fun EquipmentView(
                                 horizontalAlignment = Alignment.Start,
                             ) {
                                 Text( // machine name
-                                    text = machineName,
+                                    text = machine.name,
                                     style = Typography.bodyLarge
                                 )
 
@@ -312,7 +312,7 @@ fun EquipmentView(
                                 */
                                 Button(
                                     onClick = {
-                                        viewModel.selectMachine(machineName)
+                                        viewModel.selectMachine(machine.name)
                                         onEquipmentClicked() },
                                     shape = CircleShape,
                                     colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -333,7 +333,7 @@ fun EquipmentView(
                                 horizontalAlignment = Alignment.End,
                             ) {
                                 Text(
-                                    text = viewModel.machineWaitTimes.value[machineName].toString(),
+                                    text = viewModel.machineWaitTimes.value[machine.name].toString(),
                                     style = Typography.bodyLarge
                                 )
                                 Text(
