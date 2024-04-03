@@ -280,14 +280,6 @@ fun EquipmentInfoView(
                         .height(300.dp)
                         .align(Alignment.CenterHorizontally),
 
-
-                    /*
-                    painter = painterResource(id = context.resources.getIdentifier(
-                        "form_visual_" + viewModel.selectedMachine.value.id.toString(),
-                        "drawable",
-                        context.packageName
-                    )), /* EDIT ME: retrieve from gif */ */
-
                     painter = rememberAsyncImagePainter(
                         runBlocking {
                         ImageRequest.Builder(context).data(data = context.resources.getIdentifier(
