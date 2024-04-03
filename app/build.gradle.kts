@@ -88,4 +88,8 @@ dependencies {
     implementation("io.ktor:ktor-client-resources:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
+    //Splash Screen
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
 }

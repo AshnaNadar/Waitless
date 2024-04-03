@@ -14,6 +14,7 @@ import org.example.userinterface.Home.HomeView
 import org.example.userinterface.Home.HomeWorkoutView
 import org.example.userinterface.LastSetCountdownTimer
 import org.example.userinterface.Login.LoginView
+import org.example.userinterface.Login.SignUpView
 import org.example.userinterface.OngoingWorkoutTimer
 import org.example.userinterface.Saved.SavedView
 import org.example.userinterface.Settings.SettingsView
@@ -31,7 +32,16 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
         startDestination = MenuBarOptions.Login.route,
     ) {
         composable(route = MenuBarOptions.Login.route) {
-            LoginView(onLoginButtonClicked = { navController.navigate(MenuBarOptions.Home.route) })
+            LoginView(
+                onLoginButtonClicked = { navController.navigate(MenuBarOptions.Home.route) },
+                navToSignUp = { navController.navigate(MenuBarOptions.SignUp.route) }
+            )
+        }
+        composable(route = MenuBarOptions.SignUp.route) {
+            SignUpView (
+                navToHome = { navController.navigate(MenuBarOptions.Home.route) },
+                navToLogin = { navController.navigate(MenuBarOptions.Login.route) }
+            )
         }
         composable(route = MenuBarOptions.Home.route) {
             controller.refetchQueueAPIdata()
