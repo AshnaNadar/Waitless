@@ -58,7 +58,7 @@ import org.example.theme.GreyText
 import org.example.theme.Typography
 
 @Serializable
-data class SignUpRequest(val email: String, val password: String)
+data class SignUpRequest(val name: String, val email: String, val password: String)
 
 @OptIn(ExperimentalMaterial3Api::class, InternalAPI::class)
 @Composable
@@ -151,7 +151,7 @@ fun SignUpView(
                     color = DarkGrey
                 )
                 OutlinedTextField(
-                    email,
+                    username,
                     label = {Text(
                         text = "Enter your username",
                         color = GreyText)},
@@ -229,27 +229,27 @@ fun SignUpView(
                                 try {
                                     Log.d("TRY Block:", "${email}, ${password}")
                                     val response: HttpResponse =
-                                        httpClient.post("https://cs346-server-d1175eb4edfc.herokuapp.com/auth/signin") {
+                                        httpClient.post("https://cs346-server-d1175eb4edfc.herokuapp.com/auth/signup") {
                                             contentType(ContentType.Application.Json)
                                             body =
-                                                Json.encodeToString(LoginRequest(email, password))
+                                                Json.encodeToString(SignUpRequest(username, email, password))
                                         }
                                     when (response.status.value) {
                                         in 200..299 -> {
                                             // Successful login
                                             val responseBody: String = response.body()
-                                            Log.d("ResponseLogin:", responseBody)
-                                            navToHome()
+                                            Log.d("ResponseSignUp:", responseBody)
+                                            navToLogin()
                                         }
 
                                         else -> {
                                             // Other error occurred
                                             Log.d(
-                                                "ResponseLogin:",
+                                                "ResponseSignUp:",
                                                 "Unexpected response code: ${response.status.value}"
                                             )
                                             showErrorMessage = true
-                                            errorText = "Invalid Username/Password"
+                                            errorText = "Invalid Username/Email/Password"
                                         }
                                     }
                                 } catch (e: Exception) {
