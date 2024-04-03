@@ -62,8 +62,12 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         model.addWorkout(workoutName)
     }
 
-    fun removeWorkout() {
-        model.removeWorkout()
+    fun removeCreatedWorkout() {
+        model.removeCreatedWorkout()
+    }
+
+    fun deleteWorkout(id: Int) {
+        model.deleteWorkout(id)
     }
 
     fun editWorkout(workout: Workout? = null) {
