@@ -64,9 +64,10 @@ fun WaitlessApp(userViewModel: UserViewModel, userController: UserController,
         topBar = {
             if (showNav)
                 WaitlessTopBar(
+                    userViewModel = viewModel,
                     currentScreen = navBackStackEntry?.destination?.route ?: MenuBarOptions.Home.route,
                     canNavigateBack = navController.previousBackStackEntry != null,
-                    navigateUp = {navController.navigate(MenuBarOptions.Login.route)}
+                    navigateUp = {navController.popBackStack()}
                 )
         },
         bottomBar = {
@@ -81,11 +82,14 @@ fun WaitlessApp(userViewModel: UserViewModel, userController: UserController,
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WaitlessTopBar(
+    userViewModel: UserViewModel,
     currentScreen: String,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewModel by remember { mutableStateOf(userViewModel) }
+
     TopAppBar(
         title = { Text(currentScreen.split("/").last().replaceFirstChar { it.uppercase() } )},
         colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -94,7 +98,16 @@ fun WaitlessTopBar(
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
+                IconButton(onClick = {
+                    if (viewModel.creatingWorkout.value) {
+                        viewModel.creatingWorkout.value = false
+                        viewModel.removeCreatedWorkout()
+                    } else if (viewModel.editingWorkout.value) {
+                        viewModel.editingWorkout.value = false
+                        viewModel.removeCreatedWorkout() // don't add any edits made
+                    }
+                    navigateUp()
+                }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
@@ -146,7 +159,7 @@ fun WaitlessMenuBar(navController: NavHostController) {
 }
 
 @Composable
-fun RowScope.AddItem(
+fun AddItem(
     screen: MenuBarOptions,
     currentDestination: NavDestination?,
     navController: NavHostController
@@ -166,10 +179,7 @@ fun RowScope.AddItem(
     Box (
         modifier = Modifier
             .clickable(onClick = {
-                navController.navigate(screen.route) {
-                    popUpTo(navController.graph.findStartDestination().id)
-                    launchSingleTop = true
-                }
+                navController.navigate(screen.route)
             }),
         contentAlignment = Alignment.Center
     ) {

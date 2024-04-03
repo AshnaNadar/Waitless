@@ -181,20 +181,20 @@ fun LoginView(
                     Close Button
                         - routes to opening page (NULL currently)
                     */
-                    Button( // close button
-                        onClick = onLoginButtonClicked, //  TEMP: for testing
-                        shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(Color.Transparent),
-                        modifier = Modifier.size(40.dp),
-                        contentPadding = PaddingValues(0.dp),
-                    ) {
-                        Icon(
-                            imageVector = rememberClose(),
-                            contentDescription = "close",
-                            modifier = Modifier.size(30.dp),
-                            tint = GreyText
-                        )
-                    }
+//                    Button( // close button
+//                        onClick = onLoginButtonClicked, //  TEMP: for testing
+//                        shape = CircleShape,
+//                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+//                        modifier = Modifier.size(40.dp),
+//                        contentPadding = PaddingValues(0.dp),
+//                    ) {
+//                        Icon(
+//                            imageVector = rememberClose(),
+//                            contentDescription = "close",
+//                            modifier = Modifier.size(30.dp),
+//                            tint = GreyText
+//                        )
+//                    }
                 }
 
                 Text(
