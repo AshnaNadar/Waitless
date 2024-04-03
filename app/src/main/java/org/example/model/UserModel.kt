@@ -383,7 +383,7 @@ class UserModel : IPresenter() {
     // creates new Workout and adds it to savedWorkouts
     fun addWorkout(workoutName: String? = null) {
         if (workoutName == null) { // start creating new workout in selectedWorkout
-            removeWorkout() // remove selected workout
+            removeCreatedWorkout() // remove currently selected workout (blank slate)
             creatingWorkout = true
         } else { // add selectedWorkout to savedWorkouts
             selectedWorkout.name = workoutName
@@ -412,8 +412,8 @@ class UserModel : IPresenter() {
         return selectedWorkout.machines.isEmpty()
     }
 
-    // clears selectedWorkout
-    fun removeWorkout() {
+    // clears selectedWorkout & ends creating workout process
+    fun removeCreatedWorkout() {
         creatingWorkout = false
 
         // clear selected workout
@@ -421,6 +421,16 @@ class UserModel : IPresenter() {
         selectedWorkout.machines.clear()
         selectedWorkout.inQueue.clear()
         currentMachine = ""
+    }
+
+    fun deleteWorkout(id: Int) {
+        savedWorkouts.forEachIndexed { i, savedWorkout ->
+            if (savedWorkout.id == id) {
+                savedWorkouts.removeAt(i)
+            }
+        }
+
+        // TODO: update in db
     }
 
 
@@ -463,7 +473,7 @@ class UserModel : IPresenter() {
                     }
                 }
             }
-            removeWorkout() // remove selected workout
+            removeCreatedWorkout() // remove selected workout
         }
     }
 

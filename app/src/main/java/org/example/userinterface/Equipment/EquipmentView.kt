@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -150,6 +151,89 @@ fun rememberRemove(): ImageVector {
     }
 }
 
+// delete button: https://www.composables.com/icons
+@Composable
+fun rememberDelete(): ImageVector {
+    return remember {
+        ImageVector.Builder(
+            name = "delete",
+            defaultWidth = 40.0.dp,
+            defaultHeight = 40.0.dp,
+            viewportWidth = 40.0f,
+            viewportHeight = 40.0f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(11.208f, 34.708f)
+                quadToRelative(-1.041f, 0f, -1.833f, -0.77f)
+                quadToRelative(-0.792f, -0.771f, -0.792f, -1.855f)
+                verticalLineTo(9.25f)
+                horizontalLineTo(8.25f)
+                quadToRelative(-0.583f, 0f, -0.958f, -0.396f)
+                reflectiveQuadToRelative(-0.375f, -0.937f)
+                quadToRelative(0f, -0.542f, 0.375f, -0.917f)
+                reflectiveQuadToRelative(0.958f, -0.375f)
+                horizontalLineToRelative(6.458f)
+                quadToRelative(0f, -0.583f, 0.375f, -0.958f)
+                reflectiveQuadToRelative(0.959f, -0.375f)
+                horizontalLineTo(24f)
+                quadToRelative(0.583f, 0f, 0.938f, 0.375f)
+                quadToRelative(0.354f, 0.375f, 0.354f, 0.958f)
+                horizontalLineToRelative(6.5f)
+                quadToRelative(0.541f, 0f, 0.937f, 0.375f)
+                reflectiveQuadToRelative(0.396f, 0.917f)
+                quadToRelative(0f, 0.583f, -0.396f, 0.958f)
+                reflectiveQuadToRelative(-0.937f, 0.375f)
+                horizontalLineToRelative(-0.334f)
+                verticalLineToRelative(22.833f)
+                quadToRelative(0f, 1.084f, -0.791f, 1.855f)
+                quadToRelative(-0.792f, 0.77f, -1.875f, 0.77f)
+                close()
+                moveToRelative(0f, -25.458f)
+                verticalLineToRelative(22.833f)
+                horizontalLineToRelative(17.584f)
+                verticalLineTo(9.25f)
+                close()
+                moveToRelative(4.125f, 18.042f)
+                quadToRelative(0f, 0.583f, 0.396f, 0.958f)
+                reflectiveQuadToRelative(0.938f, 0.375f)
+                quadToRelative(0.541f, 0f, 0.916f, -0.375f)
+                reflectiveQuadToRelative(0.375f, -0.958f)
+                verticalLineTo(14f)
+                quadToRelative(0f, -0.542f, -0.375f, -0.937f)
+                quadToRelative(-0.375f, -0.396f, -0.916f, -0.396f)
+                quadToRelative(-0.584f, 0f, -0.959f, 0.396f)
+                quadToRelative(-0.375f, 0.395f, -0.375f, 0.937f)
+                close()
+                moveToRelative(6.709f, 0f)
+                quadToRelative(0f, 0.583f, 0.396f, 0.958f)
+                quadToRelative(0.395f, 0.375f, 0.937f, 0.375f)
+                reflectiveQuadToRelative(0.937f, -0.375f)
+                quadToRelative(0.396f, -0.375f, 0.396f, -0.958f)
+                verticalLineTo(14f)
+                quadToRelative(0f, -0.542f, -0.396f, -0.937f)
+                quadToRelative(-0.395f, -0.396f, -0.937f, -0.396f)
+                reflectiveQuadToRelative(-0.937f, 0.396f)
+                quadToRelative(-0.396f, 0.395f, -0.396f, 0.937f)
+                close()
+                moveTo(11.208f, 9.25f)
+                verticalLineToRelative(22.833f)
+                verticalLineTo(9.25f)
+                close()
+            }
+        }.build()
+    }
+}
+
 @Composable
 fun EquipmentView(
     userViewModel: UserViewModel,
@@ -183,6 +267,35 @@ fun EquipmentView(
 
                     Spacer(modifier = Modifier.weight(1f))
 
+
+                    /*
+                    Delete Button
+                        - doesn't create workout / deletes edited workout
+                        - goes back to saved workout/home page
+                    */
+                    Button(
+                        onClick = {
+                            if (viewModel.creatingWorkout.value) {
+                                viewModel.removeCreatedWorkout()
+                            } else if (viewModel.editingWorkout.value) {
+                                viewModel.deleteWorkout(viewModel.selectedWorkout.value.id);
+                            }
+                            onDoneSelectingClicked() },
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        modifier = Modifier.size(30.dp),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Icon(
+                            imageVector = rememberDelete(),
+                            contentDescription = "delete",
+                            modifier = Modifier.size(30.dp),
+                            tint = DarkGrey
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
                     /*
                     Checkmark/Done Button
                         - prompts user to name workout if creating new workout
@@ -191,14 +304,19 @@ fun EquipmentView(
                     Button(
                         onClick = {
                             if (viewModel.creatingWorkout.value) {
-                                if (viewModel.noMachinesAdded()) {
-                                    viewModel.removeWorkout()
+                                if (viewModel.noMachinesAdded()) { // don't create empty workout
+                                    viewModel.removeCreatedWorkout()
                                     onDoneSelectingClicked()
                                 } else {
                                     showDialog.value = true
                                 }
                             } else { // editing state, apply changes to selectedWorkout
-                                viewModel.editWorkout()
+                                if (viewModel.noMachinesAdded()) { // delete workout if empty
+                                    viewModel.deleteWorkout(viewModel.selectedWorkout.value.id);
+                                } else {
+                                    viewModel.editWorkout()
+                                }
+
                                 onDoneSelectingClicked()
                             } },
                         shape = CircleShape,
@@ -217,7 +335,7 @@ fun EquipmentView(
                     if (showDialog.value) {
                         NameWorkoutDialog(
                             onDismissRequest = { // cancel (don't add new workout)
-                                viewModel.removeWorkout()
+                                viewModel.removeCreatedWorkout()
                                 onDoneSelectingClicked()
                                 showDialog.value = false },
                             onConfirmation = {

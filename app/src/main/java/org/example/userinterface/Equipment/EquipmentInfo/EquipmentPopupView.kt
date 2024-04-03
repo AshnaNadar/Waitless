@@ -1,4 +1,5 @@
 package org.example.userinterface.Equipment.EquipmentInfo
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -49,6 +52,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+import coil.size.Size
+import org.example.MainActivity
 import org.example.R
 import org.example.controller.UserController
 import org.example.theme.Background
@@ -72,6 +83,16 @@ fun EquipmentInfoView(
     val controller by remember { mutableStateOf(userController) }
     val cornerRadius = 10.dp
     val (selectedIndex, onIndexSelected) = remember { mutableStateOf<Int?>(0) } // initially on Info tab
+    val context = LocalContext.current
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            if (SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+        }
+        .build()
 
     Box()
     {
@@ -158,7 +179,11 @@ fun EquipmentInfoView(
                         modifier = Modifier
                             .height(300.dp)
                             .align(Alignment.CenterHorizontally),
-                        painter = painterResource(id = R.drawable.treadmill), /* EDIT ME: retrieve from web */
+                        painter = painterResource(id = context.resources.getIdentifier(
+                            "visual_" + viewModel.selectedMachine.value.id.toString(),
+                            "drawable",
+                            context.packageName
+                        )),
                         contentDescription = stringResource(id = R.string.machine_image)
                 )
 
@@ -250,9 +275,25 @@ fun EquipmentInfoView(
             } else { // Form tab: display image, text description of form
                 Image(
                     modifier = Modifier
+                        .fillMaxWidth()
                         .height(300.dp)
                         .align(Alignment.CenterHorizontally),
-                    painter = painterResource(id = R.drawable.treadmill), /* EDIT ME: retrieve from web */
+
+                    painter = painterResource(id = context.resources.getIdentifier(
+                        "form_visual_" + viewModel.selectedMachine.value.id.toString(),
+                        "drawable",
+                        context.packageName
+                    )), /* EDIT ME: retrieve from gif */
+                    /*
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(context).data(data = context.resources.getIdentifier(
+                            "form_visual_" + viewModel.selectedMachine.value.id.toString(),
+                            "drawable",
+                            context.packageName
+                        )).apply(block = {
+                            size(Size.ORIGINAL)
+                        }).build(), imageLoader = imageLoader
+                    ), */
                     contentDescription = stringResource(id = R.string.machine_image)
                 )
 
