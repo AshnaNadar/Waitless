@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
-    <style name="Theme.Cleandesktopui" parent="android:Theme.Material.Light.NoActionBar"/>
+
+<style name="Theme.Cleandesktopui" parent="android:Theme.Material.Light.NoActionBar" />
+
+<style name="Theme.Cleandesktopui.Starting" parent="Theme.SplashScreen">
+    <!-- Set the splash screen background to dark green -->
+    <item name="windowSplashScreenBackground">@color/dark_green</item>
+    <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated
+         drawable. -->
+    <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen</item>
+    <!-- Set the theme of the Activity that follows your splash screen. -->
+    <item name="postSplashScreenTheme">@style/Theme.Cleandesktopui</item>
+</style>
 </resources>

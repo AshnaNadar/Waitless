@@ -19,6 +19,12 @@ sealed class MenuBarOptions (
         icon = Icons.Default.ExitToApp
     )
 
+    data object SignUp: MenuBarOptions(
+        route = "signup",
+        title = "Signup",
+        icon = Icons.Default.ExitToApp
+    )
+
     data object EquipmentInfo: MenuBarOptions(
         route = "equipment/info",
         title = "Equipment Info",

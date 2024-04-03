@@ -421,20 +421,6 @@ fun HomeView(
                             text = "Your Workouts",
                             style = Typography.headlineSmall
                         )
-
-                        /*
-                        See All Button ??
-                            - routes to saved workouts page
-                        */
-                        TextButton(
-                            onClick = onSeeAllClicked,
-                            // colors = ButtonDefaults.buttonColors(LightGreen)
-                        ) {
-                            Text(
-                                text = "See All",
-                                style = Typography.bodySmall,
-                                color = DarkGreen)
-                        }
                     }
                 }
 

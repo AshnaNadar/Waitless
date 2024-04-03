@@ -49,6 +49,8 @@ class UserController(val model: UserModel) {
             model.machineStartTime = System.currentTimeMillis()
             model.waiting = false
         }
+        model.workoutStartTime = System.currentTimeMillis()
+        model.machinesCompleted += model.currentMachine
     }
 
     fun refreshQueueStatus() {
@@ -89,6 +91,7 @@ class UserController(val model: UserModel) {
         leaveAllQueues(model.userid) {}
         model.selectedWorkout.inQueue.clear()
         model.waiting = false
+        model.showWorkoutSummary = true
     }
 
     fun moveToNextMachine() {
@@ -106,6 +109,7 @@ class UserController(val model: UserModel) {
         if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
             model.machineStartTime = System.currentTimeMillis()
             model.waiting = false
+            model.machinesCompleted += model.currentMachine
         } else if (model.machineWaitTimes[model.currentMachine] == 1) { // Check if current user is the one waiting in queue
             getUserQueues(model.userid) { response ->
                 if (model.currentMachine in (response.body()?.queues ?: emptyList())) {

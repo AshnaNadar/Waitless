@@ -55,7 +55,9 @@ fun WaitlessApp(userViewModel: UserViewModel, userController: UserController,
     var showNav by rememberSaveable { mutableStateOf(true) }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     showNav = when (navBackStackEntry?.destination?.route) {
-        MenuBarOptions.Login.route -> false // on this screen bottom bar should be hidden
+        // on this screen bottom bar should be hidden
+        MenuBarOptions.SignUp.route -> false
+        MenuBarOptions.Login.route -> false
         else -> true // in all other cases show bottom bar
     }
     Scaffold(

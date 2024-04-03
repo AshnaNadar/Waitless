@@ -24,6 +24,9 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var waiting = mutableStateOf(true)
     var lastSet = mutableStateOf(false)
     var lastSetStartTime = mutableLongStateOf(System.currentTimeMillis())
+    var showWorkoutSummary =  mutableStateOf(false)
+    var workoutStartTime = mutableLongStateOf(System.currentTimeMillis())
+    var machinesCompleted = mutableStateOf(mutableListOf<String>())
 
     // Creating and Editing Workouts (Saved Page)
     var creatingWorkout = mutableStateOf(false)
@@ -110,6 +113,9 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         waiting.value = model.waiting
         lastSet.value = model.lastSet
         lastSetStartTime.longValue = model.lastSetStartTime
+        showWorkoutSummary.value = model.showWorkoutSummary
+        workoutStartTime.longValue = model.workoutStartTime
+        machinesCompleted.value = model.machinesCompleted.toMutableList()
 
         // Editing Workouts
         creatingWorkout.value = model.creatingWorkout

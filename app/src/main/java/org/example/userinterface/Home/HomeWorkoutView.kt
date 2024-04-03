@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -48,6 +50,7 @@ import org.example.theme.LightGrey
 import org.example.theme.Typography
 import org.example.viewmodel.UserViewModel
 import kotlinx.coroutines.delay
+import org.example.userinterface.TimeoutPopup
 import org.example.userinterface.timeElapsedForMachine
 import org.example.userinterface.timeRemainingForLastSet
 
@@ -92,7 +95,6 @@ fun HomeWorkoutView(
                 */
                 TextButton(
                     onClick = {
-                        onStopWorkoutClicked()
                         controller.refetchQueueAPIdata()
                         controller.endWorkout()
                     },
@@ -159,40 +161,55 @@ fun HomeWorkoutView(
                                 }
                             }
 
-                            Column( // Time Elapsed
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                Text(
-                                    text = "${timeElapsedForMachine.intValue / 60}:${String.format("%02d", timeElapsedForMachine.intValue % 60)}",
-                                    style = Typography.bodyLarge,
-                                )
-                                Text(
-                                    text = "mins elapsed",
-                                    style = Typography.bodyLarge
-                                )
+                            if (viewModel.lastSet.value) { // Display countdown timer if in last set
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                    Column( // Countdown Timer ??
+                                        horizontalAlignment = Alignment.End
+                                    ) {
+                                        Text(
+                                            text = "Last Set Countdown",
+                                            style = Typography.bodyMedium,
+                                            color = DarkGreen,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "${timeRemainingForLastSet.intValue / 60}:${
+                                                String.format(
+                                                    "%02d",
+                                                    timeRemainingForLastSet.intValue % 60
+                                                )
+                                            }",
+                                            style = Typography.bodyLarge,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            text = "mins left",
+                                            style = Typography.bodyLarge
+                                        )
+                                    }
+                                }
+                            } else {
+                                Column( // Time Elapsed
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    Text(
+                                        text = "${timeElapsedForMachine.intValue / 60}:${String.format("%02d", timeElapsedForMachine.intValue % 60)}",
+                                        style = Typography.bodyLarge,
+                                    )
+                                    Text(
+                                        text = "mins elapsed",
+                                        style = Typography.bodyLarge
+                                    )
+                                }
                             }
+
+
                         }
                     }
 
                     if (viewModel.lastSet.value) { // Display countdown timer if in last set
                         Row (verticalAlignment = Alignment.CenterVertically) {
-
-                            Column( // Countdown Timer ??
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                Text(
-                                    text = "Last Set Countdown",
-                                    style = Typography.bodyMedium
-                                )
-                                Text(
-                                    text = "${timeRemainingForLastSet.intValue / 60}:${String.format("%02d", timeRemainingForLastSet.intValue % 60)}",
-                                    style = Typography.bodyLarge,
-                                )
-                                Text(
-                                    text = "mins left",
-                                    style = Typography.bodyLarge
-                                )
-                            }
 
                             if (viewModel.selectedWorkout.value.machines.size > 1) { // Show Next Machine only if more than machines in workout
                                 /*
@@ -264,6 +281,21 @@ fun HomeWorkoutView(
                     }
                 }
 
+                // BOTTOM SECTION (Upcoming machines)
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(3.dp)
+                ) {
+                    /* Upcoming Machines Heading */
+                    Text(
+                        text = "Upcoming Machines",
+                        style = Typography.headlineSmall
+                    )
+                }
+
             } else if (viewModel.waiting.value) { // If waiting (in queue) for next machine
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -328,27 +360,63 @@ fun HomeWorkoutView(
                         }
                     }
                 }
+                // BOTTOM SECTION (Upcoming machines)
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(3.dp)
+                ) {
+                    /* Upcoming Machines Heading */
+                    Text(
+                        text = "Upcoming Machines",
+                        style = Typography.headlineSmall
+                    )
+                }
             } else {
-                Text(
-                    text = "No more machines remaining",  // ??
-                    style = Typography.bodyLarge
-                )
+                Column {
+                    val timeElapsed = (System.currentTimeMillis() - viewModel.workoutStartTime.longValue) / 1000
+                    Text(
+                        text = "Total Time Elapsed: ${timeElapsed / 60}:${String.format("%02d", timeElapsed % 60)}\n",
+                        style = TextStyle(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = "Machines Used: ",
+                        style = TextStyle(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        text = viewModel.machinesCompleted.value
+                            .joinToString(separator = "\n")
+                    )
+
+                }
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                    /*
+                  exit to home
+                  */
+                    Button(
+                        onClick = {
+                            onStopWorkoutClicked()
+                        },
+                        colors = ButtonDefaults.buttonColors(DarkGreen),
+                        shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(70.dp)
+                            .padding(0.dp, 10.dp)
+                            .padding(start = 4.dp)
+                    ) {
+                        Text(
+                            text = "Exit",
+                            style = Typography.bodyMedium
+                        )
+                    }
+                }
+                controller.endWorkout()
             }
 
-            // BOTTOM SECTION (Upcoming machines)
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(3.dp)
-            ) {
-                /* Upcoming Machines Heading */
-                Text(
-                    text = "Upcoming Machines",
-                    style = Typography.headlineSmall
-                )
-            }
 
             Column( // Scrollable column to go through upcoming machines
                 verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -373,10 +441,13 @@ fun HomeWorkoutView(
                             ) {
                                 Text(
                                     text = machine,
-                                    style = Typography.bodyLarge
+                                    style = Typography.bodyLarge,
                                 )
 
-                                Row {
+                                Row (
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp)
+                                ) {
                                     /*
                                 Info Button
                                     - routes to equipment info page
@@ -398,10 +469,17 @@ fun HomeWorkoutView(
                                         )
                                     }
                                     if (machine in viewModel.selectedWorkout.value.inQueue) {
-                                        Text(
-                                            text = "Waiting in Queue",  // ??
-                                            style = Typography.bodyMedium
-                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .background(DarkGreen, RoundedCornerShape(4.dp))
+                                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                        ) {
+                                            Text(
+                                                text = "Waiting in Queue",
+                                                style = Typography.bodyMedium,
+                                                color = Color.White
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -441,19 +519,18 @@ fun HomeWorkoutView(
     }
 }
 
-
-// Old stop workout button:
-//                Button(
-//                    onClick = onStopWorkoutClicked,
-//                    shape = CircleShape,
-//                    colors = ButtonDefaults.buttonColors(DarkGreen),
-//                    modifier = Modifier.size(30.dp),
-//                    contentPadding = PaddingValues(0.dp),
-//                ) {
-//                    Icon(
-//                        imageVector = rememberStopCircle(),
-//                        contentDescription = "stop",
-//                        modifier = Modifier.size(20.dp),
-//                        tint = DarkGreen
-//                    )
-//                }
+//// Old stop workout button:
+////                Button(
+////                    onClick = onStopWorkoutClicked,
+////                    shape = CircleShape,
+////                    colors = ButtonDefaults.buttonColors(DarkGreen),
+////                    modifier = Modifier.size(30.dp),
+////                    contentPadding = PaddingValues(0.dp),
+////                ) {
+////                    Icon(
+////                        imageVector = rememberStopCircle(),
+////                        contentDescription = "stop",
+////                        modifier = Modifier.size(20.dp),
+////                        tint = DarkGreen
+////                    )
+////                }
