@@ -59,6 +59,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
+import kotlinx.coroutines.runBlocking
 import org.example.MainActivity
 import org.example.R
 import org.example.controller.UserController
@@ -279,21 +280,24 @@ fun EquipmentInfoView(
                         .height(300.dp)
                         .align(Alignment.CenterHorizontally),
 
+
+                    /*
                     painter = painterResource(id = context.resources.getIdentifier(
                         "form_visual_" + viewModel.selectedMachine.value.id.toString(),
                         "drawable",
                         context.packageName
-                    )), /* EDIT ME: retrieve from gif */
-                    /*
+                    )), /* EDIT ME: retrieve from gif */ */
+
                     painter = rememberAsyncImagePainter(
+                        runBlocking {
                         ImageRequest.Builder(context).data(data = context.resources.getIdentifier(
                             "form_visual_" + viewModel.selectedMachine.value.id.toString(),
                             "drawable",
                             context.packageName
-                        )).apply(block = {
+                        ))}.apply(block = {
                             size(Size.ORIGINAL)
                         }).build(), imageLoader = imageLoader
-                    ), */
+                    ),
                     contentDescription = stringResource(id = R.string.machine_image)
                 )
 
