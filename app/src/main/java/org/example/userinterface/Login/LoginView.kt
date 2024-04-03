@@ -301,7 +301,7 @@ fun LoginView(
                                                 "Unexpected response code: ${response.status.value}"
                                             )
                                             showErrorMessage = true
-                                            errorText = "Invalid Username/Password"
+                                            errorText = "Invalid Username/Password (You must verify your email before logging in)"
                                         }
                                     }
                                 } catch (e: Exception) {
