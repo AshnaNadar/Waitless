@@ -16,6 +16,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.delete
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -427,6 +428,22 @@ class UserModel : IPresenter() {
         savedWorkouts.forEachIndexed { i, savedWorkout ->
             if (savedWorkout.id == id) {
                 savedWorkouts.removeAt(i)
+                runBlocking {
+                    val client = HttpClient() {
+                        install(ContentNegotiation) {
+                            json()
+                        }
+                    }
+                    val body = createWorkoutBody(
+                        workout = exposedWorkout(selectedWorkout.name, userId),
+                        exercises = selectedWorkout.machineIds
+                    )
+                    client.delete("https://cs346-server-d1175eb4edfc.herokuapp.com/workouts/${selectedWorkout.id}") {
+                        contentType(ContentType.Application.Json)
+                        setBody(body)
+                    }
+                    println("Done Deletion")
+                }
             }
         }
 
