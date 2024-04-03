@@ -255,15 +255,14 @@ fun HomeView(
     onStartClicked: () -> Unit = {},
 ) {
     val canStartWorkout = userViewModel.canStartWorkout.value
-    val showDialog = userViewModel.showDialog.value
+    //val showDialog = userViewModel.showDialog.value
 
 
-    LaunchedEffect(showDialog) {
-        if (showDialog) {
-            userViewModel.updateShowLocationDialog(false) // Reset the dialog to not show after being handled
-        }
-    }
-
+//    LaunchedEffect(showDialog) {
+//        if (showDialog) {
+//            userViewModel.updateShowLocationDialog(false) // Reset the dialog to not show after being handled
+//        }
+//    }
 
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
@@ -338,8 +337,12 @@ fun HomeView(
                     */
                     Button(
                         onClick = {
-                            viewModel.addWorkout()
-                            onInfoClicked() },
+                            println("This is canStartWorkout: " + canStartWorkout)
+                            if (canStartWorkout) {
+                                viewModel.addWorkout()
+                                onInfoClicked()
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(DarkGreen),
                         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
                         modifier = Modifier
@@ -400,11 +403,11 @@ fun HomeView(
                         */
                         Button(
                             onClick = {
+                                println(canStartWorkout)
                                 if (canStartWorkout) {
                                     onStartClicked()
                                     userController.startWorkout()
                                 } else {
-                                    // trigger location services (request to turn on location services) - help me call heckAndRequestLocationPermissions() from MainActivity here
                                     userViewModel.updateShowDialog(true)
                                 }
                             },
@@ -497,7 +500,6 @@ fun HomeView(
                 }
             }
         }
-
 
         // gradient at bottom of screen
         val gradient = Brush.verticalGradient(

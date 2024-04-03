@@ -23,14 +23,9 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
 
     // Today's Workout (Home Page)
     var canStartWorkout = mutableStateOf(false)
-        private set // Optional: Makes the setter private to restrict modifications from outside the ViewModel.
 
     var locationRequester: (() -> Unit)? = null
     val showLocationDialog: MutableState<Boolean> = mutableStateOf(false)
-    fun updateShowLocationDialog(show: Boolean) {
-        showLocationDialog.value = show
-    }
-    val showDialog: MutableState<Boolean> = mutableStateOf(false)
 
     var selectedWorkout = mutableStateOf(Workout("", mutableListOf<String>(), mutableSetOf<String>())) // Empty if no workout selected
     var workoutOngoing = mutableStateOf(false)
@@ -75,7 +70,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     }
 
     fun updateShowDialog(show: Boolean) {
-        showDialog.value = show
+        showLocationDialog.value = show
     }
 
     // Saved Workout Functions
