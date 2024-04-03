@@ -1,5 +1,6 @@
 package org.example.userinterface
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -8,6 +9,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.controller.UserController
@@ -15,15 +18,16 @@ import org.example.viewmodel.UserViewModel
 
 // Timeout constants in seconds
 
-const val LAST_SET_COUNTDOWN = 2 * 60 // time allocated for last set
+//const val LAST_SET_COUNTDOWN = 2 * 60 // time allocated for last set
 const val FIRST_WARNING = 10 * 60 // time for first timeout popup display after current machine has started
 const val MOVE_TO_LAST_SET = 1 * 60 // time for auto kicking the user to last set countdown
 const val AUTO_DISMISS_POPUP_DELAY = 15 // time after which popups are auto dismissed
 var timeRemainingForLastSet = mutableIntStateOf(0)
 var timeElapsedForMachine = mutableIntStateOf(0)
+var timeElapsedForWorkout = mutableIntStateOf(0)
 
 // uncomment below values only for testing!!
-//const val LAST_SET_COUNTDOWN = 10 // time allocated for last set
+const val LAST_SET_COUNTDOWN = 10 // time allocated for last set
 //const val FIRST_WARNING = 6 // time for first timeout popup display after current machine has started
 //const val MOVE_TO_LAST_SET = 30 // time for auto kicking the user to last set countdown
 //const val AUTO_DISMISS_POPUP_DELAY = 10 // time after which popups are auto dismissed
@@ -43,7 +47,7 @@ fun LastSetCountdownTimer(viewModel: UserViewModel, controller: UserController) 
 }
 
 @Composable
-fun OngoingWorkoutTimer(viewModel: UserViewModel, controller: UserController) {
+fun OngoingWorkoutTimer(viewModel: UserViewModel, controller: UserController, navToHome: () -> Unit = {}) {
     val showFirstWarning = remember { mutableStateOf(false) }
     val showFinalWarning = remember { mutableStateOf(false) }
     val finalWarningInitiated = remember { mutableStateOf(false) }
@@ -107,6 +111,15 @@ fun OngoingWorkoutTimer(viewModel: UserViewModel, controller: UserController) {
             viewModel = viewModel
         )
     }
+
+//    if (viewModel.showWorkoutSummary.value and !viewModel.workoutOngoing.value) {
+//        WorkoutSummaryPopup(
+//            onDismiss = { viewModel.showWorkoutSummary.value = false },
+//            controller = controller,
+//            viewModel = viewModel,
+//            navToHome
+//        )
+//    }
 }
 
 @Composable
@@ -143,3 +156,48 @@ fun TimeoutPopup(onDismiss: () -> Unit, onOneMoreMinute: () -> Unit, isFirstWarn
         }
     )
 }
+
+@Composable
+fun WorkoutSummaryPopup(onDismiss: () -> Unit, controller: UserController, viewModel: UserViewModel, navToHome: () -> Unit = {}) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Workout Summary") },
+        text = {
+            val timeElapsed = (System.currentTimeMillis() - viewModel.workoutStartTime.longValue) / 1000
+            Column {
+                Text(
+                    text = "Total Time Elapsed: ${timeElapsed / 60}:${String.format("%02d", timeElapsed % 60)}\n",
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = "Machines Used: ",
+                    style = TextStyle(fontWeight = FontWeight.Bold)
+                )
+//                val currentWorkoutID = viewModel.selectedWorkout.value.id
+//                Text(
+//                    text = "${
+//                        viewModel.savedWorkouts.value.find { it.id == currentWorkoutID }
+//                            ?.machines
+//                            ?.joinToString(separator = "\n")
+//                    }"
+//                )
+                Text(
+                    text = viewModel.machinesCompleted.value
+                        .joinToString(separator = "\n")
+                )
+
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    navToHome()
+                    onDismiss()
+                }
+            ) {
+                Text(text = "End Workout")
+            }
+        }
+    )
+}
+

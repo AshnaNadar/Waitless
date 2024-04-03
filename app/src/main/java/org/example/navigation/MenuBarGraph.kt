@@ -25,7 +25,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
     val viewModel by remember { mutableStateOf(userViewModel) }
     val controller by remember { mutableStateOf(userController) }
     LastSetCountdownTimer(viewModel, controller)
-    OngoingWorkoutTimer(viewModel, controller)
+    OngoingWorkoutTimer(viewModel, controller, navToHome = { navController.navigate(MenuBarOptions.Home.route) })
 
     NavHost(
         navController = navController,

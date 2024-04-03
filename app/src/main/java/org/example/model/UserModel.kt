@@ -159,6 +159,21 @@ class UserModel : IPresenter() {
             field = value
             notifySubscribers()
         }
+    var showWorkoutSummary: Boolean = false // Displaying workout summary popup
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var workoutStartTime: Long = 0 // Start time of current workout
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var machinesCompleted: List<String> = emptyList()
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
 
     // Creating and Editing workouts (Saved Page)
     var creatingWorkout: Boolean = false
@@ -335,12 +350,12 @@ class UserModel : IPresenter() {
         // temporarily hardcoding values for testing:
 
 //        savedWorkouts = mutableListOf(
-//            Workout("Cardio Blast",
+//            Workout(1, "Cardio Blast", mutableListOf(1,2,3),
 //                mutableListOf(
 //                    "Stationarybike",
 //                    "Treadmill",
-//                    "Ellipticaltrainer")
-//            ),
+//                    )
+//            )
 //            Workout("Upper Body Sculpt",
 //                mutableListOf(
 //                    "Smith machine",
