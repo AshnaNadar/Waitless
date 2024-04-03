@@ -64,7 +64,7 @@ fun WaitlessApp(userViewModel: UserViewModel, userController: UserController,
                 WaitlessTopBar(
                     currentScreen = navBackStackEntry?.destination?.route ?: MenuBarOptions.Home.route,
                     canNavigateBack = navController.previousBackStackEntry != null,
-                    navigateUp = {navController.navigate(MenuBarOptions.Login.route)}
+                    navigateUp = {navController.popBackStack()}
                 )
         },
         bottomBar = {
@@ -144,7 +144,7 @@ fun WaitlessMenuBar(navController: NavHostController) {
 }
 
 @Composable
-fun RowScope.AddItem(
+fun AddItem(
     screen: MenuBarOptions,
     currentDestination: NavDestination?,
     navController: NavHostController
@@ -164,10 +164,7 @@ fun RowScope.AddItem(
     Box (
         modifier = Modifier
             .clickable(onClick = {
-                navController.navigate(screen.route) {
-                    popUpTo(navController.graph.findStartDestination().id)
-                    launchSingleTop = true
-                }
+                navController.navigate(screen.route)
             }),
         contentAlignment = Alignment.Center
     ) {
