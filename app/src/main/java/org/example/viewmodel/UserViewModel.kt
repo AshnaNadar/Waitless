@@ -21,6 +21,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     var workoutOngoing = mutableStateOf(false)
     var machineStartTime = mutableLongStateOf(System.currentTimeMillis())
     var currentMachine = mutableStateOf("")
+    var currentMachineID = mutableIntStateOf(0)
     var waiting = mutableStateOf(true)
     var lastSet = mutableStateOf(false)
     var lastSetStartTime = mutableLongStateOf(System.currentTimeMillis())
@@ -110,6 +111,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
         workoutOngoing.value = model.workoutOngoing
         machineStartTime.longValue = model.machineStartTime
         currentMachine.value = model.currentMachine
+        currentMachineID.value = model.currentMachineID
         waiting.value = model.waiting
         lastSet.value = model.lastSet
         lastSetStartTime.longValue = model.lastSetStartTime

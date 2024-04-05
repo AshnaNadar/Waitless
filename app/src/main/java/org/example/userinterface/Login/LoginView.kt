@@ -275,7 +275,7 @@ fun LoginView(
                     Button(
                         onClick = {
                             //NOTE: Uncomment next line for testing purposes only!
-                            // onLoginButtonClicked()
+                             onLoginButtonClicked()
                             coroutineScope.launch {
                                 val httpClient = HttpClient()
                                 try {

@@ -15,16 +15,16 @@ interface QueueApiInterface {
     fun removeUser(@Path("user_id") userId: String): Call<QueueData>
 
     @POST("/join/{machine_id}/{user_id}")
-    fun joinQueue(@Path("machine_id") machineId: String, @Path("user_id") userId: String): Call<QueueData>
+    fun joinQueue(@Path("machine_id") machineId: Int, @Path("user_id") userId: String): Call<QueueData>
 
     @POST("/leave/{machine_id}/{user_id}")
-    fun leaveQueue(@Path("machine_id") machineId: String, @Path("user_id") userId: String): Call<QueueData>
+    fun leaveQueue(@Path("machine_id") machineId: Int, @Path("user_id") userId: String): Call<QueueData>
 
     @POST("/leave_all/{user_id}")
     fun leaveAllQueues(@Path("user_id") userId: String): Call<QueueData>
 
     @GET("/waiting/{machine_id}")
-    fun getQueueCount(@Path("machine_id") machineId: String): Call<QueueData>
+    fun getQueueCount(@Path("machine_id") machineId: Int): Call<QueueData>
 
     @GET("/queues/{user_id}")
     fun getUserQueues(@Path("user_id") userId: String): Call<QueueData>

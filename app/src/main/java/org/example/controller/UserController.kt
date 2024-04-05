@@ -23,9 +23,9 @@ class UserController(val model: UserModel) {
 
     fun refetchQueueAPIdata() {
         // Get Machine Wait Times
-        model.allMachines.forEach { machine ->
-            getQueueCount(machine) { response ->
-                model.machineWaitTimes[machine] = response.body()?.count ?: -1
+        model.allMachineData.forEach { machine ->
+            getQueueCount(machine.id) { response ->
+                model.machineWaitTimes[machine.name] = response.body()?.count ?: -1
             }
         }
         println("Fetched from Queue API")
@@ -34,14 +34,16 @@ class UserController(val model: UserModel) {
     fun selectWorkout(workout: Workout) {
         model.selectedWorkout = workout.copy()
         model.currentMachine = workout.machines.first()
+        model.currentMachineID = workout.machineIds.first()
     }
 
     fun startWorkout() {
         refetchQueueAPIdata()
         model.workoutOngoing = true
+        model.currentMachineID = model.selectedWorkout.machineIds.first()
         model.currentMachine = model.selectedWorkout.machines.first()
         if (model.machineWaitTimes[model.currentMachine] != 0) { // Queue is not empty
-            joinQueue(model.currentMachine, model.userid) { response ->
+            joinQueue(model.currentMachineID, model.userid) { response ->
                 println("Joined Queue")
             }
             model.waiting = true
@@ -50,19 +52,19 @@ class UserController(val model: UserModel) {
             model.waiting = false
         }
         model.workoutStartTime = System.currentTimeMillis()
-        model.machinesCompleted += model.currentMachine
+        model.machinesCompleted = mutableListOf(model.currentMachine)
     }
 
     fun refreshQueueStatus() {
         var peopleWaiting = 0
-        getQueueCount(model.currentMachine) { response ->
+        getQueueCount(model.currentMachineID) { response ->
             peopleWaiting = response.body()?.count ?: -1
             if (peopleWaiting == 1) {
                 getUserQueues(model.userid) { response ->
-                    if (model.currentMachine in (response.body()?.queues
+                    if (model.currentMachineID in (response.body()?.queues
                             ?: emptyList())
                     ) { // Check if current user is the one waiting in queue
-                        leaveQueue(model.currentMachine, model.userid) {}
+                        leaveQueue(model.currentMachineID, model.userid) {}
                         model.machineStartTime = System.currentTimeMillis()
                         model.waiting = false
                     }
@@ -75,8 +77,8 @@ class UserController(val model: UserModel) {
         model.lastSet = true
         model.lastSetStartTime = System.currentTimeMillis()
         refetchQueueAPIdata()
-        if (model.selectedWorkout.machines.size > 1) { // If more machines remaining in workout
-            joinQueue(model.selectedWorkout.machines[1], model.userid) {}
+        if (model.selectedWorkout.machineIds.size > 1) { // If more machines remaining in workout
+            joinQueue(model.selectedWorkout.machineIds[1], model.userid) {}
             refetchQueueAPIdata()
             model.selectedWorkout.inQueue.add(model.selectedWorkout.machines[1])
         }
@@ -87,7 +89,9 @@ class UserController(val model: UserModel) {
         model.lastSet = false
         model.selectedWorkout.name = ""
         model.selectedWorkout.machines = mutableListOf()
+        model.selectedWorkout.machineIds = mutableListOf()
         model.currentMachine = ""
+        model.currentMachineID = -1
         leaveAllQueues(model.userid) {}
         model.selectedWorkout.inQueue.clear()
         model.waiting = false
@@ -103,7 +107,9 @@ class UserController(val model: UserModel) {
         println("moved to next machine")
         model.lastSet = false
         model.currentMachine = model.selectedWorkout.machines[1]
+        model.currentMachineID = model.selectedWorkout.machineIds[1]
         model.selectedWorkout.machines = model.selectedWorkout.machines.drop(1).toMutableList()
+        model.selectedWorkout.machineIds = model.selectedWorkout.machineIds.drop(1).toMutableList()
 
         refetchQueueAPIdata()
         if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
@@ -112,13 +118,13 @@ class UserController(val model: UserModel) {
             model.machinesCompleted += model.currentMachine
         } else if (model.machineWaitTimes[model.currentMachine] == 1) { // Check if current user is the one waiting in queue
             getUserQueues(model.userid) { response ->
-                if (model.currentMachine in (response.body()?.queues ?: emptyList())) {
-                    leaveQueue(model.currentMachine, model.userid) {}
+                if (model.currentMachineID in (response.body()?.queues ?: emptyList())) {
+                    leaveQueue(model.currentMachineID, model.userid) {}
                     model.machineStartTime = System.currentTimeMillis()
                     model.waiting = false
                 } else { // join queue and wait
                     joinQueue(
-                        model.currentMachine,
+                        model.currentMachineID,
                         model.userid
                     ) {} // in case Last Set was not clicked
                     model.selectedWorkout.inQueue.add(model.currentMachine)
@@ -126,7 +132,7 @@ class UserController(val model: UserModel) {
                 }
             }
         } else { // join queue and wait
-            joinQueue(model.currentMachine, model.userid) {} // in case Last Set was not clicked
+            joinQueue(model.currentMachineID, model.userid) {} // in case Last Set was not clicked
             model.waiting = true
         }
     }
