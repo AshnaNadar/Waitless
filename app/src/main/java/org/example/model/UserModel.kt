@@ -123,6 +123,10 @@ class UserModel : IPresenter() {
         }
 
     var userid: String = "20871851"
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
 
     // Today's Workout (Home Page)
     var selectedWorkout: Workout = Workout(0, "", mutableListOf<Int>(), mutableListOf<String>())

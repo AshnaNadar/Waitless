@@ -42,11 +42,14 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.example.controller.UserController
 import org.example.theme.*
 import org.example.viewmodel.UserViewModel
+import java.time.format.TextStyle
 
 // info button: https://www.composables.com/icons
 @Composable
@@ -248,7 +251,6 @@ fun HomeView(
     userViewModel: UserViewModel,
     userController: UserController,
     onInfoClicked: () -> Unit = {},
-    onSeeAllClicked: () -> Unit = {},
     onStartClicked: () -> Unit = {},
 ) {
 
@@ -276,7 +278,11 @@ fun HomeView(
                 /* Page Title */
                 Text(
                     text = "Today's Workout",
-                    style = Typography.headlineMedium
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        color = DarkGreen,
+                        fontSize = 29.sp
+                    )
                 )
 
                 if (viewModel.selectedWorkout.value.name == "") { // no workout selected
@@ -308,13 +314,14 @@ fun HomeView(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .heightIn(120.dp)
+                    .padding(top = 12.dp)
             ) {
                 if (viewModel.selectedWorkout.value.name == "") { // No workout selected
                     /* Label visible if no workout selected.*/
                     Text(
                         text = "No active workout - start one now!",
                         style = Typography.bodyMedium,
-                        color = GreyText,
+                        color = DarkGrey,
                         textAlign = TextAlign.Center
                     )
 
@@ -419,7 +426,11 @@ fun HomeView(
                         /* Your Workouts Heading */
                         Text(
                             text = "Your Workouts",
-                            style = Typography.headlineSmall
+                            style = androidx.compose.ui.text.TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = DarkGreen,
+                                fontSize = 25.sp
+                            )
                         )
                     }
                 }

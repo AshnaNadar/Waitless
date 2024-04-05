@@ -1,5 +1,6 @@
 package org.example.userinterface.Login
 
+import QueueApiFunctions.addUser
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -67,6 +69,7 @@ import org.example.theme.DarkGreen
 import org.example.theme.DarkGrey
 import org.example.theme.GreyText
 import org.example.theme.Typography
+import org.example.viewmodel.UserViewModel
 
 @Serializable
 data class LoginRequest(val email: String, val password: String)
@@ -127,6 +130,7 @@ fun rememberClose(): ImageVector {
 @Composable
 fun LoginView(
     onLoginButtonClicked: () -> Unit = {},
+    userViewModel: UserViewModel,
     navToSignUp: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -134,6 +138,7 @@ fun LoginView(
     var showErrorMessage by remember { mutableStateOf(false) }
     var errorText = ""
     val coroutineScope = rememberCoroutineScope()
+    val viewModel by remember { mutableStateOf(userViewModel) }
 
     Scaffold() { innerPadding ->
         /* Contains all items for this screen. */
@@ -275,7 +280,8 @@ fun LoginView(
                     Button(
                         onClick = {
                             //NOTE: Uncomment next line for testing purposes only!
-                             onLoginButtonClicked()
+//                             onLoginButtonClicked()
+                            addUser(email) {}
                             coroutineScope.launch {
                                 val httpClient = HttpClient()
                                 try {
@@ -292,6 +298,7 @@ fun LoginView(
                                             val responseBody: String = response.body()
                                             Log.d("ResponseLogin:", responseBody)
                                             onLoginButtonClicked()
+                                            viewModel.userid.value = email
                                         }
 
                                         else -> {
