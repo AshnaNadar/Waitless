@@ -4,7 +4,7 @@ package org.example.queue.api
 
 data class QueueData(
     val message: String?,
-    val queues: List<String>?,
+    val queues: List<Int>?,
     val count: Int?,
     val successCode: Int?
 )

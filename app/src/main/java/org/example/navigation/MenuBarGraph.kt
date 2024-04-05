@@ -33,6 +33,7 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
     ) {
         composable(route = MenuBarOptions.Login.route) {
             LoginView(
+                userViewModel = viewModel,
                 onLoginButtonClicked = { navController.navigate(MenuBarOptions.Home.route) },
                 navToSignUp = { navController.navigate(MenuBarOptions.SignUp.route) }
             )
@@ -50,7 +51,6 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
             } else {
                 HomeView(
                     onInfoClicked = { navController.navigate(MenuBarOptions.Equipment.route) },
-                    onSeeAllClicked = { navController.navigate(MenuBarOptions.Saved.route) },
                     onStartClicked = { navController.navigate(MenuBarOptions.HomeWorkout.route) },
                     userViewModel = viewModel,
                     userController = controller

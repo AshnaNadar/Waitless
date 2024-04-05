@@ -69,7 +69,7 @@ data class Workout(
         name = name,
         machines = machines,
         machineIds = machinesIds,
-        inQueue = mutableSetOf<String>() // Initialize inQueue here
+        inQueue = mutableSetOf<String>(), // Initialize inQueue here
     )
     fun copy(): Workout { // For deep copy
         val newMachines = mutableListOf<String>()
@@ -123,6 +123,10 @@ class UserModel : IPresenter() {
         }
 
     var userid: String = "20871851"
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
 
     // Today's Workout (Home Page)
     var selectedWorkout: Workout = Workout(0, "", mutableListOf<Int>(), mutableListOf<String>())
@@ -131,6 +135,11 @@ class UserModel : IPresenter() {
             notifySubscribers()
         }
     var currentMachine: String = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+    var currentMachineID: Int = 0
         set(value) {
             field = value
             notifySubscribers()
@@ -254,9 +263,9 @@ class UserModel : IPresenter() {
 
     fun fetchQueueAPIdata() {
         // Get Machine Wait Times
-        allMachines.forEach { machine ->
-            getQueueCount(machine) { response ->
-                machineWaitTimes[machine] = response.body()?.count ?: -1
+        allMachineData.forEach { machine ->
+            getQueueCount(machine.id) { response ->
+                machineWaitTimes[machine.name] = response.body()?.count ?: -1
                 notifySubscribers()
             }
         }

@@ -43,6 +43,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.example.controller.UserController
 import org.example.theme.Background
 import org.example.theme.DarkGreen
@@ -50,6 +51,7 @@ import org.example.theme.LightGrey
 import org.example.theme.Typography
 import org.example.viewmodel.UserViewModel
 import kotlinx.coroutines.delay
+import org.example.theme.LightGreen
 import org.example.userinterface.TimeoutPopup
 import org.example.userinterface.timeElapsedForMachine
 import org.example.userinterface.timeRemainingForLastSet
@@ -82,30 +84,39 @@ fun HomeWorkoutView(
                     .padding(3.dp)
             ) {
                 /* Page Title */
-                Text(
-                    text = "Current Machine",
-                    style = Typography.headlineMedium
-                )
+                if (viewModel.currentMachine.value == "") {
+                    Text(
+                        text = "Workout Summary",
+                        style = TextStyle(fontWeight = FontWeight.Bold, color = DarkGreen, fontSize = 29.sp)
+                    )
+                } else {
+                    Text(
+                        text = "Current Machine",
+                        style = TextStyle(fontWeight = FontWeight.Bold, color = DarkGreen, fontSize = 29.sp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                /*
+                if (viewModel.currentMachine.value != "") {
+                    /*
                 End Workout Button
                     - routes back to home page
                 */
-                TextButton(
-                    onClick = {
-                        controller.refetchQueueAPIdata()
-                        controller.endWorkout()
-                    },
-                ) {
-                    Text(
-                        text = "End Workout",
-                        style = Typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        textDecoration = TextDecoration.Underline,
-                        color = DarkGreen,
-                    )
+                    TextButton(
+                        onClick = {
+                            controller.refetchQueueAPIdata()
+                            controller.endWorkout()
+                        },
+                    ) {
+                        Text(
+                            text = "End Workout",
+                            style = Typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline,
+                            color = DarkGreen,
+                        )
+                    }
                 }
             }
 
@@ -292,7 +303,8 @@ fun HomeWorkoutView(
                     /* Upcoming Machines Heading */
                     Text(
                         text = "Upcoming Machines",
-                        style = Typography.headlineSmall
+                        style = TextStyle(fontWeight = FontWeight.Bold, color = DarkGreen, fontSize = 29.sp)
+
                     )
                 }
 
@@ -375,22 +387,37 @@ fun HomeWorkoutView(
                     )
                 }
             } else {
-                Column {
-                    val timeElapsed = (System.currentTimeMillis() - viewModel.workoutStartTime.longValue) / 1000
-                    Text(
-                        text = "Total Time Elapsed: ${timeElapsed / 60}:${String.format("%02d", timeElapsed % 60)}\n",
-                        style = TextStyle(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = "Machines Used: ",
-                        style = TextStyle(fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = viewModel.machinesCompleted.value
-                            .joinToString(separator = "\n")
-                    )
 
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 5.dp, bottom = 10.dp) // Add padding to the left
+                        .background(color = LightGreen, shape = RoundedCornerShape(8.dp)) // Apply background color
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp) // Add padding inside the Box
+                    ) {
+                        val timeElapsed = (System.currentTimeMillis() - viewModel.workoutStartTime.longValue) / 1000
+                        Text(
+                            text = "Total Time Elapsed: ${timeElapsed / 60}:${String.format("%02d", timeElapsed % 60)} minutes\n",
+                            style = TextStyle(fontWeight = FontWeight.Bold, color = DarkGreen, fontSize = 18.sp),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = "Machines Used: ",
+                            style = TextStyle(fontWeight = FontWeight.Bold, color = DarkGreen, fontSize = 18.sp),
+                        )
+                        Text(
+                            text = viewModel.machinesCompleted.value
+                                .joinToString(separator = "\n"),
+                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp),
+
+                            modifier = Modifier.padding(bottom = 8.dp) // Add padding to the bottom of the text
+                        )
+                    }
                 }
+
+
                 Row (verticalAlignment = Alignment.CenterVertically) {
                     /*
                   exit to home

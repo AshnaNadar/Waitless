@@ -14,13 +14,14 @@ import org.example.model.Machine
 // Read all values needed in the UI from here
 class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     // User Info
-    var userid: String = ""
+    var userid = mutableStateOf("")
 
     // Today's Workout (Home Page)
     var selectedWorkout = mutableStateOf(Workout(0, "", mutableListOf<Int>(), mutableListOf<String>())) // Empty if no workout selected
     var workoutOngoing = mutableStateOf(false)
     var machineStartTime = mutableLongStateOf(System.currentTimeMillis())
     var currentMachine = mutableStateOf("")
+    var currentMachineID = mutableIntStateOf(0)
     var waiting = mutableStateOf(true)
     var lastSet = mutableStateOf(false)
     var lastSetStartTime = mutableLongStateOf(System.currentTimeMillis())
@@ -54,7 +55,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
             model.fetchQueueAPIdata()
         }
         model.subscribe(this)
-        addUser(model.userid) {}
+//        addUser(model.email) {}
     }
 
     // Saved Workout Functions
@@ -103,13 +104,14 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     }
 
     override fun update() {
-        userid = model.userid
+        userid.value = model.userid
 
         // Today's Workout (Home)
         selectedWorkout.value = model.selectedWorkout
         workoutOngoing.value = model.workoutOngoing
         machineStartTime.longValue = model.machineStartTime
         currentMachine.value = model.currentMachine
+        currentMachineID.value = model.currentMachineID
         waiting.value = model.waiting
         lastSet.value = model.lastSet
         lastSetStartTime.longValue = model.lastSetStartTime

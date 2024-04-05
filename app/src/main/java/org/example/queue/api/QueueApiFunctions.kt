@@ -15,7 +15,7 @@ object QueueApiFunctions {
     // Initializing API interface
     private val retrofitBuilder: QueueApiInterface = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
-       // .baseUrl("http://10.0.2.2:8000") // localhost for testing purposes
+//        .baseUrl("http://10.0.2.2:8000") // localhost for testing purposes
         .baseUrl("https://waitless-queue.onrender.com")
         .build()
         .create(QueueApiInterface::class.java)
@@ -66,7 +66,7 @@ object QueueApiFunctions {
 
 
     // Function to join a queue (POST)
-    fun joinQueue(machineId: String, userId: String, callback: (Response<QueueData?>) -> Unit) {
+    fun joinQueue(machineId: Int, userId: String, callback: (Response<QueueData?>) -> Unit) {
         val retrofitCall = retrofitBuilder.joinQueue(machineId, userId)
         retrofitCall.enqueue(object : Callback<QueueData?> {
             override fun onResponse(call: Call<QueueData?>, response: Response<QueueData?>) {
@@ -80,7 +80,7 @@ object QueueApiFunctions {
 
 
     // Function to leave a queue (POST)
-    fun leaveQueue(machineId: String, userId: String, callback: (Response<QueueData?>) -> Unit) {
+    fun leaveQueue(machineId: Int, userId: String, callback: (Response<QueueData?>) -> Unit) {
         val retrofitCall = retrofitBuilder.leaveQueue(machineId, userId)
         retrofitCall.enqueue(object : Callback<QueueData?> {
             override fun onResponse(call: Call<QueueData?>, response: Response<QueueData?>) {
@@ -108,7 +108,7 @@ object QueueApiFunctions {
 
 
     // Function to get the count of people in a queue for a specific machine (GET)
-    fun getQueueCount(machineId: String, callback: (Response<QueueData?>) -> Unit) {
+    fun getQueueCount(machineId: Int, callback: (Response<QueueData?>) -> Unit) {
         val retrofitCall = retrofitBuilder.getQueueCount(machineId)
         retrofitCall.enqueue(object : Callback<QueueData?> {
             override fun onResponse(call: Call<QueueData?>, response: Response<QueueData?>) {

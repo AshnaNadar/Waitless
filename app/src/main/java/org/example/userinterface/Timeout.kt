@@ -19,18 +19,17 @@ import org.example.viewmodel.UserViewModel
 // Timeout constants in seconds
 
 //const val LAST_SET_COUNTDOWN = 2 * 60 // time allocated for last set
-const val FIRST_WARNING = 10 * 60 // time for first timeout popup display after current machine has started
-const val MOVE_TO_LAST_SET = 1 * 60 // time for auto kicking the user to last set countdown
-const val AUTO_DISMISS_POPUP_DELAY = 15 // time after which popups are auto dismissed
+//const val FIRST_WARNING = 10 * 60 // time for first timeout popup display after current machine has started
+//const val MOVE_TO_LAST_SET = 1 * 60 // time for auto kicking the user to last set countdown
+//const val AUTO_DISMISS_POPUP_DELAY = 15 // time after which popups are auto dismissed
 var timeRemainingForLastSet = mutableIntStateOf(0)
 var timeElapsedForMachine = mutableIntStateOf(0)
-var timeElapsedForWorkout = mutableIntStateOf(0)
 
 // uncomment below values only for testing!!
 const val LAST_SET_COUNTDOWN = 10 // time allocated for last set
-//const val FIRST_WARNING = 6 // time for first timeout popup display after current machine has started
-//const val MOVE_TO_LAST_SET = 30 // time for auto kicking the user to last set countdown
-//const val AUTO_DISMISS_POPUP_DELAY = 10 // time after which popups are auto dismissed
+const val FIRST_WARNING = 1 * 60 // time for first timeout popup display after current machine has started
+const val MOVE_TO_LAST_SET = 2 * 60 // time for auto kicking the user to last set countdown
+const val AUTO_DISMISS_POPUP_DELAY = 15 // time after which popups are auto dismissed
 
 @Composable
 fun LastSetCountdownTimer(viewModel: UserViewModel, controller: UserController) {
@@ -77,7 +76,7 @@ fun OngoingWorkoutTimer(viewModel: UserViewModel, controller: UserController, na
     }
 
     LaunchedEffect(finalWarningInitiated.value) {
-        delay(5 * 1000)
+        delay(60 * 1000)
         if (finalWarningInitiated.value) {
             showFinalWarning.value = true
             finalWarningInitiated.value = false
@@ -89,7 +88,7 @@ fun OngoingWorkoutTimer(viewModel: UserViewModel, controller: UserController, na
         }
     }
 
-    if (showFirstWarning.value) {
+    if (showFirstWarning.value and !viewModel.waiting.value) {
         TimeoutPopup(
             onDismiss = { showFirstWarning.value = false },
             onOneMoreMinute = {
@@ -102,7 +101,7 @@ fun OngoingWorkoutTimer(viewModel: UserViewModel, controller: UserController, na
         )
     }
 
-    if (showFinalWarning.value) {
+    if (showFinalWarning.value and !viewModel.waiting.value) {
         TimeoutPopup(
             onDismiss = { showFinalWarning.value = false },
             onOneMoreMinute = {},
@@ -127,7 +126,7 @@ fun TimeoutPopup(onDismiss: () -> Unit, onOneMoreMinute: () -> Unit, isFirstWarn
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = "Are you still there?") },
-        text = { Text(text = "You've been using the ${viewModel.currentMachine.value} for more than 10 minutes now.") },
+        text = { Text(text = "You've been using the ${viewModel.currentMachine.value} for a while now.") },
         confirmButton = {
             if (isFirstWarning) {
                 Button(
