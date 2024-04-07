@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Button
@@ -173,101 +175,107 @@ fun SavedView(
                 .padding(top = 80.dp, start = 20.dp, end = 20.dp)
         ) {
             if (!viewModel.savedWorkouts.value.isEmpty()) {
-                LazyColumn(
-                    // Scrollable column to go through saved workouts
-                    verticalArrangement = Arrangement.spacedBy(15.dp),
-                    userScrollEnabled = true,
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
 
                     /* TOP SECTION */
-                    stickyHeader {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            /* Page Title */
-                            Text(
-                                text = "Saved Workouts",
-                                style = Typography.headlineMedium,
-                            )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        /* Page Title */
+                        Text(
+                            text = "Saved Workouts",
+                            style = Typography.headlineMedium
+                        )
 
-                            Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
-                            /*
+                        /*
                             Add Button
                                 - creates empty Workout and adds to savedWorkouts
                                 - routes to addable equipment list
                             */
-                            Button(
-                                onClick = {
-                                    viewModel.addWorkout()
-                                    onCreateWorkoutClicked()
-                                },
-                                shape = CircleShape,
-                                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                        Button(
+                            onClick = {
+                                viewModel.addWorkout()
+                                onCreateWorkoutClicked()
+                            },
+                            shape = CircleShape,
+                            colors = ButtonDefaults.buttonColors(Color.Transparent),
+                            modifier = Modifier.size(30.dp),
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Icon(
+                                imageVector = rememberAdd(),
+                                contentDescription = "edit",
                                 modifier = Modifier.size(30.dp),
-                                contentPadding = PaddingValues(0.dp),
-                            ) {
-                                Icon(
-                                    imageVector = rememberAdd(),
-                                    contentDescription = "edit",
-                                    modifier = Modifier.size(30.dp),
-                                    tint = DarkGreen
-                                )
-                            }
+                                tint = DarkGreen
+                            )
                         }
                     }
 
                     /* BOTTOM SECTION */
-                    items(viewModel.savedWorkouts.value) { workout ->
-                        Row( // Workout display (box)
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
-                                .background(LightGrey)
-                                .padding(10.dp)
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    viewModel.editWorkout(workout)
-                                    onEditWorkoutClicked()
-                                },
-                                enabled = !viewModel.workoutOngoing.value // don't allow edits if workout ongoing
+
+                    Column( // Scrollable column to go through saved workouts
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                            .weight(1f, false)
+                    ) {
+                        viewModel.savedWorkouts.value.forEach { workout ->
+                            Row( // Workout display (box)
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                                    .background(LightGrey)
+                                    .padding(10.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Create,
-                                    contentDescription = "edit workout",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = if (!viewModel.workoutOngoing.value) DarkGreen else LightGreen
-                                )
-                            }
+                                IconButton(
+                                    onClick = {
+                                        viewModel.editWorkout(workout)
+                                        onEditWorkoutClicked()
+                                    },
+                                    enabled = !viewModel.workoutOngoing.value // don't allow edits if workout ongoing
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Create,
+                                        contentDescription = "edit workout",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = if (!viewModel.workoutOngoing.value) DarkGreen else LightGreen
+                                    )
+                                }
 
-                            Spacer(modifier = Modifier.height(2.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
 
-                            Column( // Workout title
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                Text(
-                                    text = workout.name,
-                                    style = Typography.bodyLarge
-                                )
-                            }
+                                Column( // Workout title
+                                    horizontalAlignment = Alignment.Start
+                                ) {
+                                    Text(
+                                        text = workout.name,
+                                        style = Typography.bodyLarge
+                                    )
+                                }
 
-                            Spacer(modifier = Modifier.weight(1f))
+                                Spacer(modifier = Modifier.weight(1f))
 
-                            Column( // Number of machines
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                Text(
-                                    text = workout.machines.size.toString(),
-                                    style = Typography.bodyLarge
-                                )
-                                Text(
-                                    text = "machines",
-                                    style = Typography.bodyLarge
-                                )
+                                Column( // Number of machines
+                                    horizontalAlignment = Alignment.End
+                                ) {
+                                    Text(
+                                        text = workout.machines.size.toString(),
+                                        style = Typography.bodyLarge
+                                    )
+                                    Text(
+                                        text = "machines",
+                                        style = Typography.bodyLarge
+                                    )
+                                }
                             }
                         }
+                        // prevent nav bar from blocking bottom item
+                        Spacer(modifier = Modifier.height(300.dp))
                     }
                 }
             } else { // no saved workouts - empty page
@@ -277,7 +285,7 @@ fun SavedView(
                     style = Typography.headlineMedium
                 )
 
-                Column (
+                Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
