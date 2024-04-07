@@ -1,6 +1,9 @@
 # Team-14
 
-### Get Started
+_insert logo_
+
+### Waitless
+Your personal equipment queue manager!
 
 ### Using the ENV vars:
 - TODO
@@ -19,3 +22,4 @@ MVVM offers two-way binding between view and view-model. It makes use of the  ob
 
 ### Links
 [Wiki](../../wikis/Project-Proposal)
+[Proposal](https://docs.google.com/presentation/d/1mIAqhD9VFBmNFtiH0En8xOn47G4mkbT5he9cXeyLKmw/edit?usp=sharing)
