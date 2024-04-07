@@ -375,31 +375,6 @@ fun SettingsView(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Text( // Section Heading
-                    text = "Notification Settings",
-                    color = DarkGrey,
-                    style = Typography.headlineSmall,
-                    fontSize = 20.sp
-                )
-
-                Button( // Enable Notifications
-                    onClick = {
-                        /* EDIT ME: enable notifications */
-                    },
-                    colors = ButtonDefaults.buttonColors(LightGrey),
-                    shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(70.dp)
-                        .padding(0.dp, 10.dp)
-                ) {
-                    Text(
-                        text = "Enable Urgent Notifications",
-                        color = Color.Gray,
-                        style = Typography.bodyLarge
-                    )
-                }
-
                 Row( // Sign out
                     verticalAlignment = Alignment.CenterVertically
                 ) {
