@@ -5,7 +5,7 @@
 Your personal gym equipment queue manager!
 
 ## Links
-- [Wiki](../../wikis/Project-Proposal)
+- [Wiki](../../wikis/User-Documentation)
 - [Proposal](https://docs.google.com/presentation/d/1mIAqhD9VFBmNFtiH0En8xOn47G4mkbT5he9cXeyLKmw/edit?usp=sharing)
 
 ## Using the ENV vars:
