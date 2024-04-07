@@ -447,6 +447,7 @@ fun EquipmentView(
                             }
 
                             Spacer(modifier = Modifier.weight(1f))
+
                             Column( // Number of people in queue
                                 horizontalAlignment = Alignment.End,
                             ) {
@@ -462,6 +463,10 @@ fun EquipmentView(
                         }
                     }
                 }
+
+                // prevent nav bar from blocking bottom item
+                Spacer(modifier = Modifier.height(300.dp))
+
             }
         }
 
