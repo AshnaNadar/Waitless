@@ -19,7 +19,7 @@ Your personal gym equipment queue manager!
 - [Design Documentation](../../wikis/Design-Documents)
 - [Release Notes](../../wikis/Release-Notes)
 - [Meeting Minutes](../../wikis/Meeting-Minutes)
-- [Proposal](https://docs.google.com/presentation/d/1mIAqhD9VFBmNFtiH0En8xOn47G4mkbT5he9cXeyLKmw/edit?usp=sharing)
+- [Project Proposal](../../wikis/Project-Proposal)
 
 ## Using the ENV vars:
 - TODO
