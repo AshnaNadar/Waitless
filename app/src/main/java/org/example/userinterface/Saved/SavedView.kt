@@ -176,8 +176,7 @@ fun SavedView(
         ) {
             if (!viewModel.savedWorkouts.value.isEmpty()) {
                 Column(
-                    // Scrollable column to go through saved workouts
-                    verticalArrangement = Arrangement.spacedBy(15.dp),
+                    verticalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
 
                     /* TOP SECTION */
@@ -275,6 +274,8 @@ fun SavedView(
                                 }
                             }
                         }
+                        // prevent nav bar from blocking bottom item
+                        Spacer(modifier = Modifier.height(300.dp))
                     }
                 }
             } else { // no saved workouts - empty page

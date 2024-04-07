@@ -24,9 +24,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -268,8 +271,7 @@ fun HomeView(
 
         /* Contains all items for this screen. */
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.verticalScroll(rememberScrollState())
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Row( // TITLE + INFO BUTTON
@@ -416,6 +418,7 @@ fun HomeView(
 
             /* BOTTOM SECTION */
             Column (
+                verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -474,11 +477,10 @@ fun HomeView(
                             }
                         }
                     }
+                    // prevent nav bar from blocking bottom item
+                    Spacer(modifier = Modifier.height(300.dp))
                 }
             }
-
-            // prevent nav bar from blocking bottom item
-            Spacer(modifier = Modifier.height(300.dp))
         }
 
 
