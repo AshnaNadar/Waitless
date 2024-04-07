@@ -8,15 +8,15 @@ Your personal gym equipment queue manager!
 
 | Name | Email | Development Journal |
 | -------- | ------ | --- |
-|Harshitha Durai Babu|hduraiba@uwaterloo.ca|Link|
-|Michael Mavely|mmavely@uwaterloo.ca|Link|
-|Ashna Nadar|ashna.nadar@uwaterloo.ca|Link|
-|Abhinit Patil|a33patil@uwaterloo.ca|Link|
+|Harshitha Durai Babu|hduraiba@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Harshitha)|
+|Michael Mavely|mmavely@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Michael)|
+|Ashna Nadar|ashna.nadar@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Ashna)|
+|Abhinit Patil|a33patil@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Abhinit)|
 
 
 ## Links
 - [User Documentation](../../wikis/User-Documentation)
-- [Design Documentation](../../wikis/Design-Documentation)
+- [Design Documentation](../../wikis/Design-Documents)
 - [Release Notes](../../wikis/Release-Notes)
 - [Meeting Minutes](../../wikis/Meeting-Minutes)
 - [Proposal](https://docs.google.com/presentation/d/1mIAqhD9VFBmNFtiH0En8xOn47G4mkbT5he9cXeyLKmw/edit?usp=sharing)
