@@ -1,8 +1,7 @@
-# Team-14
+# Team-14 - Waitless
 
-![logo](./app/main/res/drawable/splash_logo.png)
+<img src="app/src/main/res/drawable/splash_logo.png" alt="logo" width="100">
 
-### Waitless
 Your personal gym equipment queue manager!
 
 ### Links
