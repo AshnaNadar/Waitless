@@ -1,6 +1,6 @@
 # Team-14
 
-[Image](https://docs.google.com/presentation/d/1mIAqhD9VFBmNFtiH0En8xOn47G4mkbT5he9cXeyLKmw/edit?usp=sharing)
+![logo](./app/main/res/drawable/splash_logo.png)
 
 ### Waitless
 Your personal gym equipment queue manager!
