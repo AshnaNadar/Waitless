@@ -476,6 +476,9 @@ fun HomeView(
 
                 }
             }
+
+            // prevent nav bar from blocking bottom item
+            Spacer(modifier = Modifier.height(300.dp))
         }
 
 
