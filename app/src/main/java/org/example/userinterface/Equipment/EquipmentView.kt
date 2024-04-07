@@ -408,9 +408,6 @@ fun EquipmentView(
                         Row( // machine display (box)
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .clickable {
-
-                                }
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
                                 .background(LightGrey)

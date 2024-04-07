@@ -415,65 +415,65 @@ fun HomeView(
             }
 
             /* BOTTOM SECTION */
-            LazyColumn( // Scrollable column to go through saved workouts
-                userScrollEnabled = true
+            Column (
             ) {
-
-                stickyHeader {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                    ) {
-                        /* Your Workouts Heading */
-                        Text(
-                            text = "Your Workouts",
-                            style = androidx.compose.ui.text.TextStyle(
-                                fontWeight = FontWeight.Bold,
-                                color = DarkGreen,
-                                fontSize = 25.sp
-                            )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    /* Your Workouts Heading */
+                    Text(
+                        text = "Your Workouts",
+                        style = androidx.compose.ui.text.TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = DarkGreen,
+                            fontSize = 25.sp
                         )
-                    }
+                    )
                 }
 
-                items(viewModel.savedWorkouts.value) { workout ->
-                    Row( // Workout display (box)
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .clickable { controller.selectWorkout(workout) }
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
-                            .background(LightGrey)
-                            .padding(10.dp)
-                    ) {
-                        Column( // Workout title
-                            horizontalAlignment = Alignment.Start
+                Column( // Scrollable column to go through saved workouts
+                    verticalArrangement = Arrangement.spacedBy(15.dp),
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .weight(1f, false)
+                ) {
+                    viewModel.savedWorkouts.value.forEach { workout ->
+                        Row( // Workout display (box)
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .clickable { controller.selectWorkout(workout) }
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                                .background(LightGrey)
+                                .padding(10.dp)
                         ) {
-                            Text(
-                                text = workout.name,
-                                style = Typography.bodyLarge
-                            )
-                        }
+                            Column( // Workout title
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                Text(
+                                    text = workout.name,
+                                    style = Typography.bodyLarge
+                                )
+                            }
 
-                        Column( // Number of machines
-                            horizontalAlignment = Alignment.End
-                        ) {
-                            Text(
-                                text = workout.machines.size.toString(),
-                                style = Typography.bodyLarge
-                            )
-                            Text(
-                                text = "machines",
-                                style = Typography.bodyLarge
-                            )
+                            Column( // Number of machines
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(
+                                    text = workout.machines.size.toString(),
+                                    style = Typography.bodyLarge
+                                )
+                                Text(
+                                    text = "machines",
+                                    style = Typography.bodyLarge
+                                )
+                            }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(15.dp))
-
                 }
             }
 
