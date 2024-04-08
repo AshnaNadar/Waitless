@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import kotlinx.coroutines.runBlocking
 import org.example.controller.UserController
 import org.example.userinterface.Equipment.EquipmentInfo.EquipmentInfoView
 import org.example.userinterface.Equipment.EquipmentView
@@ -34,7 +35,13 @@ fun MenuBarGraph(userViewModel: UserViewModel, userController: UserController, n
         composable(route = MenuBarOptions.Login.route) {
             LoginView(
                 userViewModel = viewModel,
-                onLoginButtonClicked = { navController.navigate(MenuBarOptions.Home.route) },
+                onLoginButtonClicked = {
+                        runBlocking {
+                            viewModel.fetchDatabase()
+                            viewModel.update()
+                        }
+                        navController.navigate(MenuBarOptions.Home.route)
+                     },
                 navToSignUp = { navController.navigate(MenuBarOptions.SignUp.route) }
             )
         }
