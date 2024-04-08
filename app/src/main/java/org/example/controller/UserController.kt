@@ -70,6 +70,9 @@ class UserController(val model: UserModel) {
                         model.waiting = false
                     }
                 }
+            } else if (peopleWaiting == 0) {
+                model.machineStartTime = System.currentTimeMillis()
+                model.waiting = false
             }
         }
     }
@@ -178,19 +181,3 @@ class UserController(val model: UserModel) {
         }
     }
 }
-        ////////////
-//        model.currentMachine = model.selectedWorkout.machines[1]
-//        joinQueue(model.currentMachine, model.email) {} // in case Last Set was not clicked
-//        model.selectedWorkout.inQueue.add(model.currentMachine)
-//
-//        if (model.machineWaitTimes[model.currentMachine] == 0) { // Check if no one is waiting
-//            leaveQueue(model.selectedWorkout.machines.first(), model.email) {}
-//            model.selectedWorkout.machines = model.selectedWorkout.machines.drop(1).toMutableList()
-//            model.selectedWorkout.inQueue.remove(model.currentMachine)
-//            model.timeStarted = System.currentTimeMillis()
-//            model.waiting = false
-//            return true
-//        } else {
-//            model.waiting = true
-//            return false
-//        }
