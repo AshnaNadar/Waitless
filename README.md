@@ -2,7 +2,9 @@
 
 <img src="app/src/main/res/drawable/splash_logo.png" alt="logo" width="100">
 
-Your personal gym equipment queue manager!
+Introducing Waitless, your personal gym equipment queue manager!
+
+Waitless is the ultimate solution to streamline your fitness routine! This innovative app allows you to effortlessly reserve gym equipment right from your phone, ensuring that you never have to wait for a machine again. With real-time updates and notifications, you can manage your workouts more efficiently and maximize your time at the gym. The app features a user-friendly interface, providing detailed information on equipment availability and allowing you to plan your sessions according to your personal fitness goals. Whether you're a beginner or a seasoned athlete, this app is designed to enhance your gym experience by keeping you one step ahead in your fitness journey.
 
 ## The Team
 
@@ -20,6 +22,13 @@ Your personal gym equipment queue manager!
 - [Release Notes](../../wikis/Release-Notes)
 - [Meeting Minutes](../../wikis/Meeting-Minutes)
 - [Project Proposal](../../wikis/Project-Proposal)
+
+
+## Development Journals
+- [Abhinit](../../wikis/wikis/Development Journal: Abhinit)
+- [Ashna](../../wikis/wikis/Development Journal: Ashna)
+- [Harshitha](../../wikis/wikis/Development Journal: Harshitha)
+- [Michael](../../wikis/wikis/Development Journal: Michael)
 
 ## Design Pattern
 
