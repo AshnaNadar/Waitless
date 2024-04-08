@@ -11,7 +11,7 @@ Waitless is the ultimate solution to streamline your fitness routine! This innov
 | Name | Email | Development Journal |
 | -------- | ------ | --- |
 |Harshitha Durai Babu|hduraiba@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Harshitha)|
-|Michael Mavely|mmavely@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Michael)|
+|Michael Mavely|mmavely@uwaterloo.ca|[Link](../../wikis/Development-Journal-:-Michael)|
 |Ashna Nadar|ashna.nadar@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Ashna)|
 |Abhinit Patil|a33patil@uwaterloo.ca|[Link](../../wikis/Development-Journal:-Abhinit)|
 
