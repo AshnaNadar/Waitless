@@ -1,5 +1,7 @@
 # Team-14 - Waitless
 
+<img src="app/src/main/res/drawable/app-video.gif" alt="logo" width="200">
+
 <img src="app/src/main/res/drawable/splash_logo.png" alt="logo" width="100">
 
 Introducing Waitless, your personal gym equipment queue manager!
@@ -21,6 +23,7 @@ Waitless is the ultimate solution to streamline your fitness routine! This innov
 - [Design Documentation](../../wikis/Design-Documents)
 - [Release Notes](../../wikis/Release-Notes)
 - [Meeting Minutes](../../wikis/Meeting-Minutes)
+- [Reflections](../../wikis/Reflections)
 - [Project Proposal](../../wikis/Project-Proposal)
 
 
