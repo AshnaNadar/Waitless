@@ -1,6 +1,6 @@
 # Team-14 - Waitless
 
-<img src="app/src/main/res/drawable/app-video.gif" alt="logo" width="200">
+<img src="app/src/main/res/drawable/app_video.gif" alt="logo" width="200">
 
 <img src="app/src/main/res/drawable/splash_logo.png" alt="logo" width="100">
 
