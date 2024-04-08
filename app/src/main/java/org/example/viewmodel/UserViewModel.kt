@@ -51,7 +51,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
 
     init {
         viewModelScope.launch {
-            model.fetchDatabaseStuff()
+            //model.fetchDatabaseStuff()
             model.fetchQueueAPIdata()
         }
         model.subscribe(this)
@@ -62,6 +62,10 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
 
     // if no workout supplied, sets creating workout state to true
     // else, adds workout to saved workouts and sets creating workout state to false
+
+    suspend fun fetchDatabase() {
+        model.fetchDatabaseStuff()
+    }
     fun addWorkout(workoutName: String? = null) {
         model.addWorkout(workoutName)
     }
