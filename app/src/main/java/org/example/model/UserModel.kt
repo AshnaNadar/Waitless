@@ -264,8 +264,9 @@ class UserModel : IPresenter() {
     fun fetchQueueAPIdata() {
         // Get Machine Wait Times
         allMachineData.forEach { machine ->
+            machineWaitTimes[machine.name] = 0
             getQueueCount(machine.id) { response ->
-                machineWaitTimes[machine.name] = response.body()?.count ?: -1
+                machineWaitTimes[machine.name] = response.body()?.count ?: 0
                 notifySubscribers()
             }
         }

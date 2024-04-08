@@ -52,7 +52,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
     init {
         viewModelScope.launch {
             //model.fetchDatabaseStuff()
-            model.fetchQueueAPIdata()
+//            model.fetchQueueAPIdata()
         }
         model.subscribe(this)
 //        addUser(model.email) {}
@@ -65,6 +65,7 @@ class UserViewModel(val model: UserModel) : ViewModel(), ISubscriber {
 
     suspend fun fetchDatabase() {
         model.fetchDatabaseStuff()
+        model.fetchQueueAPIdata()
     }
     fun addWorkout(workoutName: String? = null) {
         model.addWorkout(workoutName)
