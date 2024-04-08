@@ -25,10 +25,10 @@ Waitless is the ultimate solution to streamline your fitness routine! This innov
 
 
 ## Development Journals
-- [Abhinit](../../wikis/wikis/Development Journal: Abhinit)
-- [Ashna](../../wikis/wikis/Development Journal: Ashna)
-- [Harshitha](../../wikis/wikis/Development Journal: Harshitha)
-- [Michael](../../wikis/wikis/Development Journal: Michael)
+- [Abhinit](../../wikis/Development-Journal:-Abhinit)
+- [Ashna](../../wikis/Development-Journal:-Ashna)
+- [Harshitha](../../wikis/Development-Journal:-Harshitha)
+- [Michael](../../wikis/Development-Journal:-Michael)
 
 ## Design Pattern
 
