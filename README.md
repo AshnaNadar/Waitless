@@ -23,6 +23,7 @@ Waitless is the ultimate solution to streamline your fitness routine! This innov
 - [Meeting Minutes](../../wikis/Meeting-Minutes)
 - [Reflections](../../wikis/Reflections)
 - [Project Proposal](../../wikis/Project-Proposal)
+- [Waitless Releases](https://drive.google.com/drive/folders/17X2OwSvn1oAliCl2XZ4WgWZE1k-wfyts?usp=sharing)
 
 
 ## Development Journals
